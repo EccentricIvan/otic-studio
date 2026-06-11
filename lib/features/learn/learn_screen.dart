@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../ai_core/providers/ai_provider.dart';
 import '../../ai_core/tutor/tutor_response.dart';
 import '../../core/theme/app_colors.dart';
+import 'path/path_models.dart';
+import 'path/path_provider.dart';
 
 class LearnScreen extends ConsumerStatefulWidget {
-  const LearnScreen({super.key});
+  const LearnScreen({super.key, this.initialTopic});
+  final String? initialTopic;
 
   @override
   ConsumerState<LearnScreen> createState() => _LearnScreenState();
@@ -14,6 +18,16 @@ class LearnScreen extends ConsumerStatefulWidget {
 class _LearnScreenState extends ConsumerState<LearnScreen> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialTopic != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(chatProvider.notifier).send(widget.initialTopic!);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -84,6 +98,13 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
       ),
       body: Column(
         children: [
+          // Active paths strip — only shown when there are paths and chat is empty
+          chat.whenOrNull(
+            data: (state) => state.messages.isEmpty
+                ? _ActivePathsStrip(onPathTap: (topic) =>
+                    context.push('/path/${Uri.encodeComponent(topic)}'))
+                : null,
+          ) ?? const SizedBox.shrink(),
           Expanded(
             child: chat.when(
               loading: () =>
@@ -132,6 +153,118 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             isLoading: chat.valueOrNull?.isGenerating ?? false,
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Active paths horizontal strip ────────────────────────────────────────────
+
+class _ActivePathsStrip extends ConsumerWidget {
+  const _ActivePathsStrip({required this.onPathTap});
+  final void Function(String topic) onPathTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pathsAsync = ref.watch(studentPathsProvider);
+    return pathsAsync.when(
+      data: (rows) {
+        if (rows.isEmpty) return const SizedBox.shrink();
+        final paths = rows.map(parsedFromRow).toList();
+        return Container(
+          color: AppColors.surfaceVariant,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.route, size: 14, color: AppColors.textHint),
+                  SizedBox(width: 6),
+                  Text(
+                    'MY PATHS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 82,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: paths.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (_, i) => _PathChip(
+                    path: paths[i],
+                    onTap: () => onPathTap(paths[i].topic),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _PathChip extends StatelessWidget {
+  const _PathChip({required this.path, required this.onTap});
+  final ParsedPath path;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              path.topic,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: path.progressFraction,
+                minHeight: 5,
+                backgroundColor: AppColors.border,
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.learnColor),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${path.completedLessons}/${path.totalLessons} lessons',
+              style: const TextStyle(
+                  fontSize: 11, color: AppColors.textHint),
+            ),
+          ],
+        ),
       ),
     );
   }

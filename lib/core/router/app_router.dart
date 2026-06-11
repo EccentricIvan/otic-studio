@@ -9,6 +9,7 @@ import '../../features/collaborate/collaborate_screen.dart';
 import '../../features/create/create_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/learn/learn_screen.dart';
+import '../../features/learn/path/path_detail_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/projects/projects_screen.dart';
@@ -42,7 +43,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
-          GoRoute(path: '/learn', builder: (_, __) => const LearnScreen()),
+          GoRoute(path: '/learn', builder: (_, state) {
+            final topic = state.uri.queryParameters['topic'];
+            return LearnScreen(initialTopic: topic);
+          }),
+          GoRoute(
+            path: '/path/:topic',
+            builder: (_, state) => PathDetailScreen(
+              topic: Uri.decodeComponent(state.pathParameters['topic'] ?? ''),
+            ),
+          ),
           GoRoute(path: '/practice', builder: (_, __) => const PracticeScreen()),
           GoRoute(path: '/create', builder: (_, __) => const CreateScreen()),
           GoRoute(path: '/projects', builder: (_, __) => const ProjectsScreen()),
@@ -68,7 +78,16 @@ final appRouter = GoRouter(
       builder: (context, state, child) => AppShell(child: child),
       routes: [
         GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
-        GoRoute(path: '/learn', builder: (_, __) => const LearnScreen()),
+        GoRoute(path: '/learn', builder: (_, state) {
+          final topic = state.uri.queryParameters['topic'];
+          return LearnScreen(initialTopic: topic);
+        }),
+        GoRoute(
+          path: '/path/:topic',
+          builder: (_, state) => PathDetailScreen(
+            topic: Uri.decodeComponent(state.pathParameters['topic'] ?? ''),
+          ),
+        ),
         GoRoute(path: '/practice', builder: (_, __) => const PracticeScreen()),
         GoRoute(path: '/create', builder: (_, __) => const CreateScreen()),
         GoRoute(path: '/projects', builder: (_, __) => const ProjectsScreen()),
