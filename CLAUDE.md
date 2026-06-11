@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-OTIC Studio is a **fully offline AI-powered Learning Operating System**. It runs entirely on-device — no internet, no cloud, no external APIs, ever. The AI model (Gemma 3 1B in Phase 1, Gemma 4 in Phase 2) is bundled and runs locally via a local inference runtime (e.g., llama.cpp, Ollama, or MediaPipe LLM Inference).
+OTIC Studio is a **fully offline AI-powered Learning Operating System**. It runs entirely on-device — no internet, no cloud, no external APIs, ever. The AI model (Gemma 3 1B in Phase 1, Gemma 4 in Phase 2) is bundled and runs locally:
+
+- **Android** → LiteRT-LM (Google's on-device LLM runtime, formerly MediaPipe LLM Inference) with GPU/NPU acceleration
+- **Windows / Linux** → llama.cpp via GGUF 4-bit quantized model, called through `dart:ffi`
+
+Both platforms expose the same Dart inference interface from `packages/ai-core/`.
 
 Target platforms: Android (4 GB RAM / 32 GB storage minimum), Windows (8 GB RAM), Ubuntu (8 GB RAM).
 
@@ -29,7 +34,7 @@ otic-studio/
     desktop/          # Electron app (Windows + Ubuntu)
     android/          # React Native or Flutter app
   packages/
-    ai-core/          # Local LLM inference wrapper (Gemma via llama.cpp / GGUF)
+    ai-core/          # Local LLM inference wrapper — LiteRT-LM on Android, llama.cpp on desktop
     learning-engine/  # Learning paths, adaptive logic, mode routing
     memory-engine/    # Student profile, compressed summaries, local storage
     voice/            # Offline STT + TTS integration
@@ -85,7 +90,20 @@ Store compressed summaries only — never full conversation logs. Stored fields:
 
 ## AI Model Files
 
-Model GGUF files are large and distributed separately (USB / local server). They must be gitignored. The app must detect whether a model is present and show a clear "model not installed" state rather than failing silently.
+Model files are large and distributed separately (USB / local server, never via internet). They must be gitignored.
+
+| Platform | Format | Model | Size |
+|----------|--------|-------|------|
+| Android | `.task` (LiteRT-LM) | Gemma 3 1B | ~1 GB |
+| Windows / Linux | `.gguf` 4-bit (llama.cpp) | Gemma 3 1B Q4_K_M | ~800 MB |
+
+The app must detect whether the model file is present at startup and show a clear "Model not installed — transfer via USB" screen rather than failing silently.
+
+## Local History (Student Memory)
+
+Use SQLite via the `drift` Flutter package. Store compressed summaries only — never full conversation logs. One database file per device, never synced.
+
+Stored fields: `userId`, `age`, `interests`, `learningStyle`, `strengths`, `weaknesses`, `activeProjects`, `achievements`, `certificates`, `progressByTopic`, `goals`, `lastActive`.
 
 ## Update Mechanism
 
