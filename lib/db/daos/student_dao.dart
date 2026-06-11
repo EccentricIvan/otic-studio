@@ -17,8 +17,18 @@ class StudentDao extends DatabaseAccessor<OticDatabase>
   Future<Student?> getStudentById(int id) =>
       (select(students)..where((t) => t.id.equals(id))).getSingleOrNull();
 
+  /// All profiles on this device — admin view.
+  Future<List<Student>> getAllStudents() =>
+      (select(students)..orderBy([(t) => OrderingTerm.desc(t.lastActiveAt)]))
+          .get();
+
   Future<int> createStudent(StudentsCompanion entry) =>
       into(students).insert(entry);
+
+  /// Permanently removes a profile. Related rows (sessions, paths, badges,
+  /// projects) cascade-delete via their foreign keys.
+  Future<void> deleteStudent(int id) =>
+      (delete(students)..where((t) => t.id.equals(id))).go();
 
   Future<void> updateStudent(StudentsCompanion entry) =>
       (update(students)..where((t) => t.id.equals(entry.id.value)))

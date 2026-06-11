@@ -147,6 +147,20 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ]),
 
+          // ── Admin ────────────────────────────────────────────────────────
+          _Section('Administration', [
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings,
+                  color: AppColors.textSecondary),
+              title: const Text('Admin dashboard'),
+              subtitle: const Text(
+                  'Device info, model status, profiles, update management'),
+              onTap: () => context.go('/admin'),
+              trailing: const Icon(Icons.chevron_right,
+                  color: AppColors.textHint),
+            ),
+          ]),
+
           // ── Danger zone ───────────────────────────────────────────────────
           _Section('Data', [
             ListTile(

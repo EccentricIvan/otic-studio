@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../db/providers/db_provider.dart';
 import '../../features/achievements/achievements_screen.dart';
+import '../../features/admin/admin_screen.dart';
 import '../../features/certificates/certificates_screen.dart';
 import '../../features/collaborate/collaborate_screen.dart';
 import '../../features/create/create_screen.dart';
@@ -62,6 +63,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/collaborate', builder: (_, __) => const CollaborateScreen()),
           GoRoute(path: '/teach', builder: (_, __) => const TeachScreen()),
           GoRoute(path: '/teacher', builder: (_, __) => const TeacherScreen()),
+          GoRoute(path: '/admin', builder: (_, __) => const AdminScreen()),
           GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
         ],
       ),

@@ -5,6 +5,7 @@ import '../model/model_manager.dart';
 import '../tutor/tutor_pipeline.dart';
 import '../tutor/tutor_response.dart';
 import '../../db/providers/db_provider.dart';
+import '../../safety/emotional_safety.dart';
 
 // ── Model status ────────────────────────────────────────────────────────────
 
@@ -89,6 +90,8 @@ class ChatNotifier extends AsyncNotifier<ChatState> {
     return const ChatState();
   }
 
+  static const _safetyEngine = EmotionalSafetyEngine();
+
   Future<void> send(String message) async {
     final pipeline = await ref.read(tutorPipelineProvider.future);
     final current = state.valueOrNull ?? const ChatState();
@@ -100,10 +103,25 @@ class ChatNotifier extends AsyncNotifier<ChatState> {
       streamingText: '',
     ));
 
+    // Emotional safety check — crisis messages never reach the model
+    final safety = _safetyEngine.check(message);
+    if (safety.bypassTutor) {
+      state = AsyncData(state.requireValue.copyWith(
+        messages: [
+          ...state.requireValue.messages,
+          ChatMessage(text: safety.supportMessage!, isUser: false),
+        ],
+        isGenerating: false,
+        streamingText: '',
+      ));
+      return;
+    }
+
     String streamed = '';
     try {
       final response = await pipeline.respond(
         studentMessage: message,
+        safetyNote: safety.tutorNote,
         onToken: (token) {
           streamed += token;
           state = AsyncData(state.requireValue.copyWith(streamingText: streamed));

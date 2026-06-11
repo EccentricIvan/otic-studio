@@ -16,10 +16,13 @@ class TutorPipeline {
 
   /// Process a student message and stream the tutor response.
   /// [onToken] fires with each new token as it arrives.
+  /// [safetyNote] is an extra instruction from the emotional safety engine
+  /// (e.g. "student sounds discouraged — encourage first").
   /// Returns the complete [TutorResponse] when generation finishes.
   Future<TutorResponse> respond({
     required String studentMessage,
     void Function(String token)? onToken,
+    String? safetyNote,
   }) async {
     final topic = _detectTopic(studentMessage);
     if (topic != _currentTopic) {
@@ -28,7 +31,7 @@ class TutorPipeline {
     }
 
     final stage = _nextStage;
-    final prompt = _buildPrompt(studentMessage, stage);
+    final prompt = _buildPrompt(studentMessage, stage, safetyNote: safetyNote);
 
     final buffer = StringBuffer();
     final text = await _engine.generate(
@@ -62,7 +65,8 @@ class TutorPipeline {
     _nextStage = idx < order.length - 1 ? order[idx + 1] : TutorStage.practice;
   }
 
-  String _buildPrompt(String studentMessage, TutorStage stage) {
+  String _buildPrompt(String studentMessage, TutorStage stage,
+      {String? safetyNote}) {
     final historyText = _history
         .map((t) => '${t.role == 'tutor' ? 'OTIC' : 'Student'}: ${t.text}')
         .join('\n');
@@ -70,7 +74,7 @@ class TutorPipeline {
     return '''You are OTIC, an expert offline AI tutor for students in under-resourced schools.
 You respond in plain, encouraging language. Be concise (2-4 sentences max per stage).
 Never use bullet lists. Ask one question at the end. Never say "I am an AI".
-
+${safetyNote != null ? '\n$safetyNote\n' : ''}
 Current stage: ${stage.name.toUpperCase()}
 Stage instructions:
   answer   → Give a clear, direct explanation.
