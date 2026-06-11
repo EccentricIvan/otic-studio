@@ -1,0 +1,141 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What This Is
+
+OTIC Studio is a **fully offline AI-powered Learning Operating System**. It runs entirely on-device — no internet, no cloud, no external APIs, ever. The AI model (Gemma 3 1B in Phase 1, Gemma 4 in Phase 2) is bundled and runs locally via a local inference runtime (e.g., llama.cpp, Ollama, or MediaPipe LLM Inference).
+
+Target platforms: Android (4 GB RAM / 32 GB storage minimum), Windows (8 GB RAM), Ubuntu (8 GB RAM).
+
+## Core Constraint: Offline-First
+
+Every feature must work with zero network connectivity. Before adding any dependency or API call, verify it works fully offline. This means:
+
+- No calls to OpenAI, Anthropic, Google, or any hosted LLM API
+- No Firebase, Supabase, or cloud sync
+- SQLite or local file storage only (no cloud databases)
+- Offline STT/TTS only (e.g., Vosk, Coqui, or platform-native offline engines)
+- Certificate/badge PDF generation must work locally (e.g., jsPDF, PDFKit)
+- Updates deploy via USB drive or local school server, not the internet
+
+## Planned Architecture
+
+When code exists, it will follow this structure:
+
+```
+otic-studio/
+  apps/
+    desktop/          # Electron app (Windows + Ubuntu)
+    android/          # React Native or Flutter app
+  packages/
+    ai-core/          # Local LLM inference wrapper (Gemma via llama.cpp / GGUF)
+    learning-engine/  # Learning paths, adaptive logic, mode routing
+    memory-engine/    # Student profile, compressed summaries, local storage
+    voice/            # Offline STT + TTS integration
+    simulation/       # Domain simulations (science, math, business, etc.)
+    gamification/     # Points, badges, streaks, achievements
+    certification/    # Offline PDF certificate generation
+    collaboration/    # Local network peer collaboration (no internet)
+    safety/           # Emotional safety detection, prompt safety
+  data/
+    models/           # GGUF model files (gitignored, distributed separately)
+    knowledge/        # Seed curriculum content
+```
+
+## AI Tutor Behavior Contract
+
+Every AI response must follow this pipeline — do not short-circuit it:
+
+```
+Answer → Clarify → Practice → Apply → Create → Reflect
+```
+
+OTIC is a mentor, not a search engine. It must never stop at answering.
+
+## Learning Modes
+
+Five modes are routed through the same AI pipeline:
+
+| Mode     | Purpose                        | Outcome            |
+|----------|--------------------------------|--------------------|
+| Learn    | Understand concepts            | Conceptual clarity |
+| Practice | Exercises, challenges          | Retention          |
+| Apply    | Real-world scenarios           | Practical competence |
+| Create   | Build projects                 | Creation           |
+| Teach    | Student explains → OTIC scores | Mastery            |
+
+## User Roles
+
+`Guest` → `Student` → `Teacher` → `Admin`
+
+- Guests: no saved state, no certificates, demonstration only
+- Students: full learning features, memory, certificates
+- Teachers: read student data, create groups/quizzes, cannot modify platform
+- Admins: device/user/update management, no learning features
+
+## Student Memory Engine
+
+Store compressed summaries only — never full conversation logs. Stored fields: age, interests, learning style, strengths, weaknesses, projects, achievements, certificates, progress, goals. Storage is local SQLite per device.
+
+## Voice Learning
+
+- Use offline STT/TTS only (no cloud speech APIs)
+- Store converted text only — never store audio recordings
+
+## AI Model Files
+
+Model GGUF files are large and distributed separately (USB / local server). They must be gitignored. The app must detect whether a model is present and show a clear "model not installed" state rather than failing silently.
+
+## Update Mechanism
+
+Updates ship as packages deployable via USB flash drive or a local school LAN server. The app must support applying an update bundle without internet access.
+
+## Development Commands
+
+```powershell
+# Get dependencies
+flutter pub get
+
+# Run on Windows desktop (primary dev target)
+flutter run -d windows
+
+# Run on Android device/emulator
+flutter run -d android
+
+# Build release
+flutter build windows
+flutter build apk
+
+# Analyze code
+flutter analyze
+
+# Run tests
+flutter test
+
+# After adding a new package to pubspec.yaml
+flutter pub get
+```
+
+Flutter SDK is installed at the path managed by winget (`Google.Flutter`).
+After install, PATH must include the Flutter `bin` directory — open a new terminal if `flutter` is not found.
+
+## What to Build First
+
+Follow this order — do not jump ahead to gamification or certificates before the core tutor works:
+
+1. Local LLM integration (Gemma 3 1B loading + inference)
+2. Basic Learn mode (ask question → get mentor response)
+3. Student memory (profile creation + summary storage)
+4. Learning paths (auto-generate curriculum for a topic)
+5. Practice + Apply modes
+6. Voice learning
+7. Simulation engine
+8. Create + Teach modes
+9. Gamification + Certification
+10. Teacher dashboard
+11. Admin dashboard
+12. Collaboration (local network)
+13. Emotional safety engine
+14. Android app
+15. Update deployment tooling
