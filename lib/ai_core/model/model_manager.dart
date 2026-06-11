@@ -12,6 +12,15 @@ enum ModelStatus {
   corrupted,
 }
 
+/// A user-facing problem while installing a model from a picked file.
+class ModelInstallException implements Exception {
+  const ModelInstallException(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 class ModelInfo {
   const ModelInfo({
     required this.status,
@@ -100,6 +109,79 @@ class ModelManager {
       default:
         return 'Unknown';
     }
+  }
+
+  /// Destination used when the user installs a model through the app.
+  Future<String> installTargetPath() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final appFiles = await getApplicationDocumentsDirectory();
+      return p.join(appFiles.path, 'models', _androidModelName);
+    }
+    final docs = await getApplicationDocumentsDirectory();
+    return p.join(docs.path, 'OTIC', _desktopModelName);
+  }
+
+  /// Copies a user-picked model file into the expected location.
+  ///
+  /// Validates extension and size first, copies to a `.part` file and
+  /// renames on success so an interrupted copy is never mistaken for a
+  /// valid model. Reports progress as 0..1 through [onProgress].
+  Future<ModelInfo> installFromFile(
+    String sourcePath, {
+    void Function(double progress)? onProgress,
+  }) async {
+    final source = File(sourcePath);
+    if (!await source.exists()) {
+      throw const ModelInstallException('The selected file no longer exists.');
+    }
+
+    final allowed = defaultTargetPlatform == TargetPlatform.android
+        ? const ['.bin', '.task']
+        : const ['.gguf'];
+    final ext = p.extension(sourcePath).toLowerCase();
+    if (!allowed.contains(ext)) {
+      throw ModelInstallException(
+          'Wrong file type. This device needs a ${allowed.join(' or ')} '
+          'model file.');
+    }
+
+    final size = await source.length();
+    if (size < _minSizeBytes) {
+      throw const ModelInstallException(
+          'That file is too small to be the Gemma model — it should be '
+          'around 800 MB to 1 GB. The download or copy may be incomplete.');
+    }
+
+    final targetPath = await installTargetPath();
+    final target = File(targetPath);
+    await target.parent.create(recursive: true);
+
+    final partial = File('$targetPath.part');
+    final sink = partial.openWrite();
+    var copied = 0;
+    try {
+      await for (final chunk in source.openRead()) {
+        sink.add(chunk);
+        copied += chunk.length;
+        onProgress?.call(copied / size);
+      }
+      await sink.flush();
+      await sink.close();
+      if (await target.exists()) await target.delete();
+      await partial.rename(targetPath);
+    } catch (e) {
+      try {
+        await sink.close();
+      } catch (_) {}
+      if (await partial.exists()) await partial.delete();
+      if (e is FileSystemException) {
+        throw const ModelInstallException(
+            'Could not copy the model — the device may not have enough '
+            'free storage (about 1 GB is needed).');
+      }
+      rethrow;
+    }
+    return checkModel();
   }
 
   /// Where to tell the user to put the model file.

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,71 +6,228 @@ import '../../ai_core/model/model_manager.dart';
 import '../../ai_core/providers/ai_provider.dart';
 import '../../core/theme/app_colors.dart';
 
-class ModelNotInstalledScreen extends ConsumerWidget {
+class ModelNotInstalledScreen extends ConsumerStatefulWidget {
   const ModelNotInstalledScreen({super.key, required this.info});
 
   final ModelInfo info;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ModelNotInstalledScreen> createState() =>
+      _ModelNotInstalledScreenState();
+}
+
+class _ModelNotInstalledScreenState
+    extends ConsumerState<ModelNotInstalledScreen> {
+  bool _installing = false;
+  double _progress = 0;
+  String? _error;
+
+  Future<void> _pickAndInstall() async {
+    setState(() => _error = null);
+
+    final result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Select the Gemma model file',
+      type: FileType.any,
+    );
+    final path = result?.files.single.path;
+    if (path == null) return; // user cancelled
+
+    setState(() {
+      _installing = true;
+      _progress = 0;
+    });
+
+    try {
+      final manager = ref.read(modelManagerProvider);
+      final info = await manager.installFromFile(
+        path,
+        onProgress: (p) {
+          // Throttle rebuilds — a 1 GB copy emits thousands of chunks.
+          if (p - _progress >= 0.01 || p >= 1) {
+            setState(() => _progress = p);
+          }
+        },
+      );
+      if (!mounted) return;
+      if (info.isReady) {
+        ref.invalidate(modelInfoProvider);
+      } else {
+        setState(() {
+          _installing = false;
+          _error = 'The file was copied but failed verification. '
+              'Please try a fresh copy of the model file.';
+        });
+      }
+    } on ModelInstallException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _installing = false;
+        _error = e.message;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _installing = false;
+        _error = 'Install failed: $e';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(Icons.memory_outlined,
-                    color: AppColors.primary, size: 40),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'AI Model Not Installed',
-                style: Theme.of(context).textTheme.headlineLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                info.status == ModelStatus.corrupted
-                    ? 'A model file was found but appears corrupted or incomplete. '
-                        'Please retransfer the file.'
-                    : 'OTIC Studio needs the Gemma 3 1B model file to work. '
-                        'No internet is needed — transfer the file via USB.',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              _InstructionsCard(ref: ref),
-              const SizedBox(height: 24),
-              Row(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Check again'),
-                      onPressed: () => ref.invalidate(modelInfoProvider),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(24),
                     ),
+                    child: const Icon(Icons.memory_outlined,
+                        color: AppColors.primary, size: 40),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.science_outlined),
-                      label: const Text('Try demo mode'),
-                      onPressed: () => Navigator.of(context).pop(),
+                  const SizedBox(height: 24),
+                  Text(
+                    'AI Model Not Installed',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.info.status == ModelStatus.corrupted
+                        ? 'A model file was found but appears corrupted or '
+                            'incomplete. Please reinstall it below.'
+                        : 'OTIC Studio needs the Gemma 3 1B model file to '
+                            'work. No internet is needed — get the file from '
+                            'a USB drive or your school server, then install '
+                            'it below.',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  if (_installing) ...[
+                    _InstallProgress(progress: _progress),
+                  ] else ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.folder_open),
+                        label: const Text('Install from file…'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        onPressed: _pickAndInstall,
+                      ),
                     ),
-                  ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: Colors.red.withValues(alpha: 0.4)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: Colors.red, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(_error!,
+                                  style: const TextStyle(
+                                      color: Colors.red, fontSize: 13)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    _InstructionsCard(ref: ref),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Check again'),
+                            onPressed: () =>
+                                ref.invalidate(modelInfoProvider),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.science_outlined),
+                            label: const Text('Try demo mode'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _InstallProgress extends StatelessWidget {
+  const _InstallProgress({required this.progress});
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 12),
+              Text('Installing model… ${(progress * 100).toStringAsFixed(0)}%',
+                  style: Theme.of(context).textTheme.titleMedium),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(value: progress, minHeight: 8),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Copying the model into the app — this can take a few minutes. '
+            'Keep the app open.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ),
     );
   }
@@ -101,7 +259,7 @@ class _InstructionsCard extends ConsumerWidget {
                 children: [
                   const Icon(Icons.usb, color: AppColors.primary, size: 18),
                   const SizedBox(width: 8),
-                  Text('How to install',
+                  Text('Install by hand instead',
                       style: Theme.of(context).textTheme.titleMedium),
                   const Spacer(),
                   IconButton(
