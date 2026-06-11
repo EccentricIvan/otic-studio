@@ -44,6 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Release signing — never commit keystores or their passwords
+android/key.properties
+*.jks
+*.keystore
+
 # AI model files — distributed separately via USB/local server, never committed
 *.gguf
 *.bin

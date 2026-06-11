@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../gamification/badge_service.dart';
+import '../../shared/widgets/responsive.dart';
 import 'package:drift/drift.dart' show Value;
 
 // ── Project types ─────────────────────────────────────────────────────────────
@@ -252,9 +253,13 @@ class _SetupView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(_createProvider);
 
+    final width = MediaQuery.sizeOf(context).width;
+    final cols = width >= 700 ? 3 : 2;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Column(
+      child: MaxWidth(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
@@ -268,7 +273,7 @@ class _SetupView extends ConsumerWidget {
               style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 12),
           GridView.count(
-            crossAxisCount: 2,
+            crossAxisCount: cols,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 10,
@@ -348,6 +353,7 @@ class _SetupView extends ConsumerWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -373,7 +379,8 @@ class _ChatView extends ConsumerWidget {
     final allCount = state.messages.length +
         (state.isGenerating && state.streamingText.isNotEmpty ? 1 : 0);
 
-    return Column(
+    return MaxWidth(
+        child: Column(
       children: [
         Expanded(
           child: ListView.builder(
@@ -418,6 +425,7 @@ class _ChatView extends ConsumerWidget {
           },
         ),
       ],
+      ),
     );
   }
 }

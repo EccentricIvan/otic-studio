@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/responsive.dart';
 import 'path_models.dart';
 import 'path_provider.dart';
 
@@ -91,23 +92,25 @@ class _PathContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _PathHeader(parsed: parsed)),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) => _UnitTile(
-              unit: parsed.units[i],
-              unitIndex: i,
-              isExpanded: expandedUnit == i,
-              onTap: () => onUnitTap(i),
-              onLessonTap: (li, lesson) => onLessonTap(i, li, lesson),
+    return MaxWidth(
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _PathHeader(parsed: parsed)),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => _UnitTile(
+                unit: parsed.units[i],
+                unitIndex: i,
+                isExpanded: expandedUnit == i,
+                onTap: () => onUnitTap(i),
+                onLessonTap: (li, lesson) => onLessonTap(i, li, lesson),
+              ),
+              childCount: parsed.units.length,
             ),
-            childCount: parsed.units.length,
           ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 40)),
-      ],
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+        ],
+      ),
     );
   }
 }

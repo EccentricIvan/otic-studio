@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../db/providers/db_provider.dart';
+import '../../shared/widgets/responsive.dart';
 import 'exercise_models.dart';
 import 'practice_providers.dart';
 import 'scenario_models.dart';
@@ -46,11 +47,13 @@ class PracticeScreen extends StatelessWidget {
             unselectedLabelColor: AppColors.textSecondary,
           ),
         ),
-        body: const TabBarView(
-          children: [
-            _PracticeTab(),
-            _ApplyTab(),
-          ],
+        body: const MaxWidth(
+          child: TabBarView(
+            children: [
+              _PracticeTab(),
+              _ApplyTab(),
+            ],
+          ),
         ),
       ),
     );

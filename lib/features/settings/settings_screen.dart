@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../ai_core/providers/ai_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../db/providers/db_provider.dart';
+import '../../shared/widgets/responsive.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -16,7 +17,9 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: ListView(
+      body: MaxWidth(
+          maxWidth: 760,
+          child: ListView(
         children: [
           // ── AI Model ─────────────────────────────────────────────────────
           _Section('AI Model', [
@@ -159,6 +162,7 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 32),
         ],
+        ),
       ),
     );
   }

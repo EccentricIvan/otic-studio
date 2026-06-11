@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
+import '../../shared/widgets/responsive.dart';
 
 class ProjectsScreen extends ConsumerWidget {
   const ProjectsScreen({super.key});
@@ -54,11 +55,14 @@ class _ProjectsList extends ConsumerWidget {
           return _EmptyProjects();
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: projects.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (_, i) => _ProjectCard(project: projects[i]),
+        return MaxWidth(
+          maxWidth: 900,
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: projects.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (_, i) => _ProjectCard(project: projects[i]),
+          ),
         );
       },
     );

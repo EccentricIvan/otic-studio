@@ -5,6 +5,7 @@ import '../../ai_core/providers/ai_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../db/providers/db_provider.dart';
 import '../../gamification/badge_service.dart';
+import '../../shared/widgets/responsive.dart';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -177,7 +178,8 @@ class _TeachScreenState extends ConsumerState<TeachScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
+        child: MaxWidth(
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
@@ -323,6 +325,7 @@ class _TeachScreenState extends ConsumerState<TeachScreen> {
 
             const SizedBox(height: 40),
           ],
+        ),
         ),
       ),
     );

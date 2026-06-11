@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../features/learn/path/path_provider.dart';
+import '../../shared/widgets/responsive.dart';
 
 class TeacherScreen extends ConsumerWidget {
   const TeacherScreen({super.key});
@@ -42,7 +43,9 @@ class _StudentDashboard extends ConsumerWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Column(
+      child: MaxWidth(
+          maxWidth: 900,
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Student profile card
@@ -141,6 +144,7 @@ class _StudentDashboard extends ConsumerWidget {
           ),
           const SizedBox(height: 40),
         ],
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../features/learn/path/path_provider.dart';
 import '../../features/learn/path/path_models.dart';
+import '../../shared/widgets/responsive.dart';
 
 class CertificatesScreen extends ConsumerWidget {
   const CertificatesScreen({super.key});
@@ -92,7 +93,9 @@ class _CertsBodyState extends ConsumerState<_CertsBody> {
   Widget build(BuildContext context) {
     final pathsAsync = ref.watch(studentPathsProvider);
 
-    return CustomScrollView(
+    return MaxWidth(
+        maxWidth: 900,
+        child: CustomScrollView(
       slivers: [
         // Earned certificates section
         if (_savedFiles.isNotEmpty) ...[
@@ -141,6 +144,7 @@ class _CertsBodyState extends ConsumerState<_CertsBody> {
 
         const SliverToBoxAdapter(child: SizedBox(height: 40)),
       ],
+      ),
     );
   }
 }

@@ -49,7 +49,9 @@ class HomeScreen extends ConsumerWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-        child: ConstrainedBox(
+        child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +76,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
             ],
           ),
+        ),
         ),
       ),
     );

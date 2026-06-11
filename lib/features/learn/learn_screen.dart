@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../ai_core/providers/ai_provider.dart';
 import '../../ai_core/tutor/tutor_response.dart';
 import '../../core/theme/app_colors.dart';
+import '../../shared/widgets/responsive.dart';
 import 'path/path_models.dart';
 import 'path/path_provider.dart';
 
@@ -96,7 +97,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: MaxWidth(
+          child: Column(
         children: [
           // Active paths strip — only shown when there are paths and chat is empty
           chat.whenOrNull(
@@ -153,6 +155,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             isLoading: chat.valueOrNull?.isGenerating ?? false,
           ),
         ],
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../gamification/badge_definitions.dart';
+import '../../shared/widgets/responsive.dart';
 
 class AchievementsScreen extends ConsumerWidget {
   const AchievementsScreen({super.key});
@@ -44,8 +45,13 @@ class _AchievementsBody extends ConsumerWidget {
       data: (earned) {
         final earnedIds = earned.map((b) => b.badgeId).toSet();
         final earnedCount = earnedIds.length;
+        final width =
+            MediaQuery.sizeOf(context).width.clamp(0.0, 1000.0).toDouble();
+        final cols = adaptiveColumns(width, min: 2, max: 5, itemWidth: 200);
 
-        return CustomScrollView(
+        return MaxWidth(
+            maxWidth: 1000,
+            child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: _StatsHeader(
@@ -72,8 +78,8 @@ class _AchievementsBody extends ConsumerWidget {
                   },
                   childCount: allBadges.length,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: cols,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 1.05,
@@ -81,6 +87,7 @@ class _AchievementsBody extends ConsumerWidget {
               ),
             ),
           ],
+          ),
         );
       },
     );
