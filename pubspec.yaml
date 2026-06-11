@@ -25,6 +25,9 @@ dependencies:
   path_provider: ^2.1.4
   path: ^1.9.0
 
+  # Model installer — lets the user pick the Gemma file from USB/Downloads
+  file_picker: ^8.1.2
+
   # PDF certificate generation (offline, pure Dart)
   pdf: ^3.10.8
 
