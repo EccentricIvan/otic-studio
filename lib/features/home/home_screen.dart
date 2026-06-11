@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               _HeroSection(),
               const SizedBox(height: 48),
-              SectionHeader(
+              const SectionHeader(
                 title: 'Start Learning',
                 subtitle: 'Choose how you want to learn today',
               ),
@@ -185,10 +185,10 @@ class _LearningModesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final modes = [
-      _Mode('Learn', 'Understand concepts with your AI mentor', Icons.menu_book, AppColors.learnColor, '/learn'),
-      _Mode('Practice', 'Reinforce knowledge with exercises', Icons.edit, AppColors.practiceColor, '/practice'),
-      _Mode('Create', 'Build real projects and solutions', Icons.lightbulb, AppColors.createColor, '/create'),
-      _Mode('Teach', 'Achieve mastery by teaching OTIC', Icons.record_voice_over, AppColors.teachColor, '/learn'),
+      const _Mode('Learn', 'Understand concepts with your AI mentor', Icons.menu_book, AppColors.learnColor, '/learn'),
+      const _Mode('Practice', 'Reinforce knowledge with exercises', Icons.edit, AppColors.practiceColor, '/practice'),
+      const _Mode('Create', 'Build real projects and solutions', Icons.lightbulb, AppColors.createColor, '/create'),
+      const _Mode('Teach', 'Achieve mastery by teaching OTIC', Icons.record_voice_over, AppColors.teachColor, '/learn'),
     ];
 
     return LayoutBuilder(

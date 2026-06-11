@@ -1,97 +1,402 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../ai_core/providers/ai_provider.dart';
+import '../../ai_core/tutor/tutor_response.dart';
 import '../../core/theme/app_colors.dart';
-import '../../shared/widgets/voice_ask_widget.dart';
 
-class LearnScreen extends StatelessWidget {
+class LearnScreen extends ConsumerStatefulWidget {
   const LearnScreen({super.key});
 
   @override
+  ConsumerState<LearnScreen> createState() => _LearnScreenState();
+}
+
+class _LearnScreenState extends ConsumerState<LearnScreen> {
+  final _controller = TextEditingController();
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _send() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    _controller.clear();
+    ref.read(chatProvider.notifier).send(text);
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final chat = ref.watch(chatProvider);
+    final engineAsync = ref.watch(engineLoadedProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Learn')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            VoiceAskWidget(
-              onSubmit: (query) {
-                // TODO: send query to local Gemma AI pipeline
+      appBar: AppBar(
+        title: const Text('Learn'),
+        actions: [
+          engineAsync.when(
+            data: (engine) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Chip(
+                avatar: const Icon(Icons.memory, size: 14, color: AppColors.teachColor),
+                label: Text(
+                  engine.backendLabel,
+                  style: const TextStyle(fontSize: 11, color: AppColors.teachColor),
+                ),
+                backgroundColor: AppColors.teachColor.withValues(alpha: 0.08),
+                side: BorderSide(color: AppColors.teachColor.withValues(alpha: 0.3)),
+                padding: EdgeInsets.zero,
+              ),
+            ),
+            loading: () => const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'New session',
+            onPressed: () => ref.read(chatProvider.notifier).reset(),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: chat.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
+              data: (state) {
+                if (state.messages.isEmpty) {
+                  return _EmptyState(onTopic: (t) {
+                    ref.read(chatProvider.notifier).send(t);
+                  });
+                }
+                final itemCount = state.messages.length +
+                    (state.isGenerating && state.streamingText.isNotEmpty
+                        ? 1
+                        : 0);
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  itemCount: itemCount,
+                  itemBuilder: (context, i) {
+                    if (i == state.messages.length) {
+                      return _TutorBubble(
+                        text: state.streamingText,
+                        stage: null,
+                        followUp: null,
+                        isStreaming: true,
+                      );
+                    }
+                    final msg = state.messages[i];
+                    if (msg.isUser) return _UserBubble(text: msg.text);
+                    return _TutorBubble(
+                      text: msg.text,
+                      stage: msg.stage,
+                      followUp: msg.followUp,
+                      isStreaming: false,
+                    );
+                  },
+                );
               },
             ),
-            const SizedBox(height: 32),
-            Text('Explore Topics', style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 16),
-            _TopicsGrid(),
-          ],
-        ),
+          ),
+          _InputBar(
+            controller: _controller,
+            onSend: _send,
+            isLoading: chat.valueOrNull?.isGenerating ?? false,
+          ),
+        ],
       ),
     );
   }
 }
 
-class _TopicsGrid extends StatelessWidget {
+// ── Chat bubbles ──────────────────────────────────────────────────────────────
+
+class _UserBubble extends StatelessWidget {
+  const _UserBubble({required this.text});
+  final String text;
+
   @override
   Widget build(BuildContext context) {
-    const topics = [
-      _Topic('Mathematics', Icons.calculate, AppColors.learnColor),
-      _Topic('Physics', Icons.science, AppColors.academicColor),
-      _Topic('Programming', Icons.code, AppColors.technologyColor),
-      _Topic('Entrepreneurship', Icons.trending_up, AppColors.businessColor),
-      _Topic('Biology', Icons.biotech, AppColors.teachColor),
-      _Topic('History', Icons.history_edu, AppColors.lifeSkillsColor),
-      _Topic('Agriculture', Icons.grass, AppColors.agricultureColor),
-      _Topic('AI & Data', Icons.psychology, AppColors.secondary),
-    ];
-
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 2.4,
-      children: topics
-          .map((t) => Card(
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: t.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(t.icon, color: t.color, size: 18),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            t.label,
-                            style: Theme.of(context).textTheme.titleMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ))
-          .toList(),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: const BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(4),
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(18),
+          ),
+        ),
+        child: Text(text,
+            style: const TextStyle(color: Colors.white, height: 1.5)),
+      ),
     );
   }
 }
 
-class _Topic {
-  const _Topic(this.label, this.icon, this.color);
+class _TutorBubble extends StatelessWidget {
+  const _TutorBubble({
+    required this.text,
+    required this.stage,
+    required this.followUp,
+    required this.isStreaming,
+  });
 
-  final String label;
-  final IconData icon;
-  final Color color;
+  final String text;
+  final TutorStage? stage;
+  final String? followUp;
+  final bool isStreaming;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (stage != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4, left: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.auto_stories,
+                      size: 13, color: AppColors.textHint),
+                  const SizedBox(width: 4),
+                  Text(
+                    _label(stage!),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.textHint),
+                  ),
+                ],
+              ),
+            ),
+          Container(
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * 0.82),
+            margin: const EdgeInsets.only(bottom: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(4),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
+              ),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text(
+                    text.isEmpty ? '…' : text,
+                    style: const TextStyle(
+                        color: AppColors.textPrimary, height: 1.6),
+                  ),
+                ),
+                if (isStreaming) ...[
+                  const SizedBox(width: 8),
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.primary),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (followUp != null && !isStreaming)
+            Padding(
+              padding:
+                  const EdgeInsets.only(bottom: 12, left: 4),
+              child: Text(
+                followUp!,
+                style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textHint,
+                    fontStyle: FontStyle.italic),
+              ),
+            )
+          else
+            const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  String _label(TutorStage s) {
+    switch (s) {
+      case TutorStage.answer:   return 'OTIC · Answer';
+      case TutorStage.clarify:  return 'OTIC · Check understanding';
+      case TutorStage.practice: return 'OTIC · Practice';
+      case TutorStage.apply:    return 'OTIC · Apply it';
+      case TutorStage.create:   return 'OTIC · Create';
+      case TutorStage.reflect:  return 'OTIC · Reflect';
+    }
+  }
+}
+
+// ── Input bar ─────────────────────────────────────────────────────────────────
+
+class _InputBar extends StatelessWidget {
+  const _InputBar({
+    required this.controller,
+    required this.onSend,
+    required this.isLoading,
+  });
+
+  final TextEditingController controller;
+  final VoidCallback onSend;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.border)),
+        color: AppColors.surface,
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onSubmitted: (_) => onSend(),
+              decoration: const InputDecoration(
+                hintText: 'Ask anything — photosynthesis, Python, gravity…',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              maxLines: 3,
+              minLines: 1,
+              textInputAction: TextInputAction.send,
+            ),
+          ),
+          const SizedBox(width: 8),
+          isLoading
+              ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
+                )
+              : IconButton.filled(
+                  onPressed: onSend,
+                  icon: const Icon(Icons.arrow_upward),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Empty / starter state ─────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.onTopic});
+  final void Function(String) onTopic;
+
+  static const _starters = [
+    'Explain photosynthesis',
+    'Teach me Python from scratch',
+    'How does gravity work?',
+    'What is entrepreneurship?',
+    'Explain the water cycle',
+    'How do vaccines work?',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        children: [
+          const SizedBox(height: 40),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppColors.learnColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(Icons.auto_stories,
+                color: AppColors.learnColor, size: 36),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'What do you want to learn today?',
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'OTIC answers, then guides you through practice, apply, create, and reflect.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+          ),
+          const SizedBox(height: 32),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: _starters
+                .map((s) => ActionChip(
+                      label: Text(s),
+                      onPressed: () => onTopic(s),
+                      backgroundColor: AppColors.surfaceVariant,
+                      side: const BorderSide(color: AppColors.border),
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
 }

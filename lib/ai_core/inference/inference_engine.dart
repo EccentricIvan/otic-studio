@@ -1,0 +1,44 @@
+import 'package:flutter/foundation.dart';
+import 'litert_lm_engine.dart';
+import 'llama_cpp_engine.dart';
+
+/// Token-by-token streaming callback.
+typedef TokenCallback = void Function(String token);
+
+/// Unified interface for all local inference backends.
+/// - Android      → LiteRtLmEngineImpl  (flutter_gemma / LiteRT-LM)
+/// - Windows/Linux → LlamaCppEngineImpl (llama.cpp via dart:ffi — Phase 1b)
+/// - Dev/Test     → MockEngine          (instant canned responses)
+abstract class InferenceEngine {
+  bool get isReady;
+  String get backendLabel;
+
+  /// Load the model file from [modelPath].
+  Future<void> loadModel(String modelPath);
+
+  /// Generate a response, streaming tokens via [onToken].
+  Future<String> generate({
+    required String prompt,
+    int maxTokens = 512,
+    double temperature = 0.7,
+    TokenCallback? onToken,
+  });
+
+  /// Release native resources.
+  Future<void> dispose();
+}
+
+class ModelLoadException implements Exception {
+  ModelLoadException(this.message);
+  final String message;
+  @override
+  String toString() => 'ModelLoadException: $message';
+}
+
+/// Returns the correct engine for the current platform.
+InferenceEngine createPlatformEngine() {
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    return LiteRtLmEngineImpl();
+  }
+  return LlamaCppEngineImpl();
+}
