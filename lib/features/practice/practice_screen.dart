@@ -1,21 +1,797 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/app_colors.dart';
-import '../../shared/widgets/screen_placeholder.dart';
+import '../../db/providers/db_provider.dart';
+import 'exercise_models.dart';
+import 'practice_providers.dart';
+import 'scenario_models.dart';
+
+// ── Topic list ────────────────────────────────────────────────────────────────
+
+const _topics = [
+  'Photosynthesis',
+  'Python Programming',
+  'Mathematics',
+  'Physics',
+  'Entrepreneurship',
+  'Biology',
+  'English Writing',
+  'Artificial Intelligence',
+  'History',
+  'Economics',
+  'Chemistry',
+  'Geography',
+];
+
+// ── Root screen ───────────────────────────────────────────────────────────────
 
 class PracticeScreen extends StatelessWidget {
   const PracticeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Practice')),
-      body: const ScreenPlaceholder(
-        icon: Icons.edit,
-        color: AppColors.practiceColor,
-        title: 'Practice Mode',
-        description:
-            'Reinforce what you have learned through exercises, challenges, and problem solving. '
-            'OTIC adapts the difficulty to your level.',
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Practice'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.quiz_outlined), text: 'Practice'),
+              Tab(icon: Icon(Icons.explore_outlined), text: 'Apply'),
+            ],
+            indicatorColor: AppColors.practiceColor,
+            labelColor: AppColors.practiceColor,
+            unselectedLabelColor: AppColors.textSecondary,
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            _PracticeTab(),
+            _ApplyTab(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Shared topic picker ───────────────────────────────────────────────────────
+
+class _TopicPicker extends ConsumerWidget {
+  const _TopicPicker({
+    required this.selected,
+    required this.onSelect,
+    required this.color,
+  });
+
+  final String selected;
+  final void Function(String) onSelect;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Merge student interests with fixed topic list
+    final studentAsync = ref.watch(activeStudentProvider);
+    final studentInterests = studentAsync.valueOrNull
+            ?.interestsJson
+            .replaceAll('[', '')
+            .replaceAll(']', '')
+            .replaceAll('"', '')
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList() ??
+        [];
+
+    final allTopics = [
+      ...studentInterests.where((i) => !_topics.contains(i)),
+      ..._topics,
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+          child: Text(
+            'Choose a topic',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 42,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: allTopics.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, i) {
+              final topic = allTopics[i];
+              final isSelected = selected == topic;
+              return ChoiceChip(
+                label: Text(topic),
+                selected: isSelected,
+                onSelected: (_) => onSelect(topic),
+                selectedColor: color.withValues(alpha: 0.15),
+                side: BorderSide(
+                    color: isSelected ? color : AppColors.border),
+                labelStyle: TextStyle(
+                  color: isSelected ? color : AppColors.textSecondary,
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+                checkmarkColor: color,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PRACTICE TAB — Multiple choice exercises
+// ══════════════════════════════════════════════════════════════════════════════
+
+class _PracticeTab extends ConsumerWidget {
+  const _PracticeTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(practiceProvider);
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TopicPicker(
+            selected: state.topic,
+            color: AppColors.practiceColor,
+            onSelect: (t) {
+              ref.read(practiceProvider.notifier).setTopic(t);
+            },
+          ),
+          const SizedBox(height: 16),
+          if (state.topic.isNotEmpty && state.exercise == null && !state.isGenerating)
+            _StartCard(
+              topic: state.topic,
+              color: AppColors.practiceColor,
+              icon: Icons.quiz,
+              label: 'Generate exercise',
+              onTap: () => ref.read(practiceProvider.notifier).generate(),
+            ),
+          if (state.isGenerating) const _LoadingCard(message: 'Creating exercise…'),
+          if (state.error != null)
+            _ErrorCard(
+              message: state.error!,
+              onRetry: () => ref.read(practiceProvider.notifier).generate(),
+            ),
+          if (state.exercise != null)
+            _ExerciseCard(
+              exercise: state.exercise!,
+              state: state,
+              onAnswer: (i) => ref.read(practiceProvider.notifier).answer(i),
+              onNext: () => ref.read(practiceProvider.notifier).next(),
+              onReset: () => ref.read(practiceProvider.notifier).reset(),
+            ),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExerciseCard extends StatelessWidget {
+  const _ExerciseCard({
+    required this.exercise,
+    required this.state,
+    required this.onAnswer,
+    required this.onNext,
+    required this.onReset,
+  });
+
+  final Exercise exercise;
+  final PracticeState state;
+  final void Function(int) onAnswer;
+  final VoidCallback onNext;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Score bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.stars, size: 16, color: AppColors.practiceColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Score: ${state.score}/${state.total}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.practiceColor,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: onReset,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('Reset',
+                      style: TextStyle(
+                          fontSize: 12, color: AppColors.textHint)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Question
+          Text(
+            exercise.question,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Options
+          ...exercise.options.asMap().entries.map(
+                (e) => _OptionButton(
+                  label: _letter(e.key),
+                  text: e.value,
+                  index: e.key,
+                  state: state,
+                  onTap: () => onAnswer(e.key),
+                ),
+              ),
+
+          // Feedback
+          if (state.answered) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: state.correct
+                    ? AppColors.teachColor.withValues(alpha: 0.08)
+                    : Colors.red.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: state.correct
+                      ? AppColors.teachColor.withValues(alpha: 0.3)
+                      : Colors.red.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    state.correct ? Icons.check_circle : Icons.cancel,
+                    color:
+                        state.correct ? AppColors.teachColor : Colors.red,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          state.correct ? 'Correct!' : 'Not quite.',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: state.correct
+                                ? AppColors.teachColor
+                                : Colors.red,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          exercise.explanation,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onNext,
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('Next question'),
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.practiceColor),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _letter(int i) => ['A', 'B', 'C', 'D'][i];
+}
+
+class _OptionButton extends StatelessWidget {
+  const _OptionButton({
+    required this.label,
+    required this.text,
+    required this.index,
+    required this.state,
+    required this.onTap,
+  });
+
+  final String label;
+  final String text;
+  final int index;
+  final PracticeState state;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    Color borderColor = AppColors.border;
+    Color bgColor = AppColors.surface;
+    Color textColor = AppColors.textPrimary;
+
+    if (state.answered) {
+      if (index == state.exercise!.correctIndex) {
+        borderColor = AppColors.teachColor;
+        bgColor = AppColors.teachColor.withValues(alpha: 0.07);
+        textColor = AppColors.teachColor;
+      } else if (index == state.selectedOption) {
+        borderColor = Colors.red;
+        bgColor = Colors.red.withValues(alpha: 0.05);
+        textColor = Colors.red;
+      }
+    } else if (index == state.selectedOption) {
+      borderColor = AppColors.practiceColor;
+      bgColor = AppColors.practiceColor.withValues(alpha: 0.07);
+      textColor = AppColors.practiceColor;
+    }
+
+    return GestureDetector(
+      onTap: state.answered ? null : onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: borderColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: borderColor,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(color: textColor, height: 1.4),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// APPLY TAB — Real-world scenarios
+// ══════════════════════════════════════════════════════════════════════════════
+
+class _ApplyTab extends ConsumerStatefulWidget {
+  const _ApplyTab();
+
+  @override
+  ConsumerState<_ApplyTab> createState() => _ApplyTabState();
+}
+
+class _ApplyTabState extends ConsumerState<_ApplyTab> {
+  final _responseController = TextEditingController();
+
+  @override
+  void dispose() {
+    _responseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(applyProvider);
+
+    // Sync text controller when state resets
+    ref.listen(applyProvider, (prev, next) {
+      if (next.response.isEmpty && _responseController.text.isNotEmpty) {
+        _responseController.clear();
+      }
+    });
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TopicPicker(
+            selected: state.topic,
+            color: AppColors.createColor,
+            onSelect: (t) {
+              ref.read(applyProvider.notifier).setTopic(t);
+            },
+          ),
+          const SizedBox(height: 16),
+
+          if (state.topic.isNotEmpty &&
+              state.scenario == null &&
+              !state.isGeneratingScenario)
+            _StartCard(
+              topic: state.topic,
+              color: AppColors.createColor,
+              icon: Icons.explore,
+              label: 'Give me a scenario',
+              onTap: () =>
+                  ref.read(applyProvider.notifier).generateScenario(),
+            ),
+
+          if (state.isGeneratingScenario)
+            const _LoadingCard(message: 'Creating scenario…'),
+
+          if (state.error != null)
+            _ErrorCard(
+              message: state.error!,
+              onRetry: () =>
+                  ref.read(applyProvider.notifier).generateScenario(),
+            ),
+
+          if (state.scenario != null)
+            _ScenarioCard(
+              scenario: state.scenario!,
+              state: state,
+              responseController: _responseController,
+              onResponseChanged: (t) =>
+                  ref.read(applyProvider.notifier).setResponse(t),
+              onSubmit: () =>
+                  ref.read(applyProvider.notifier).evaluate(),
+              onNext: () =>
+                  ref.read(applyProvider.notifier).nextScenario(),
+            ),
+
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScenarioCard extends StatelessWidget {
+  const _ScenarioCard({
+    required this.scenario,
+    required this.state,
+    required this.responseController,
+    required this.onResponseChanged,
+    required this.onSubmit,
+    required this.onNext,
+  });
+
+  final Scenario scenario;
+  final ApplyState state;
+  final TextEditingController responseController;
+  final void Function(String) onResponseChanged;
+  final VoidCallback onSubmit;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Situation card
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppColors.createColor.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                  color: AppColors.createColor.withValues(alpha: 0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.place, size: 15,
+                        color: AppColors.createColor.withValues(alpha: 0.8)),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'SCENARIO',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: AppColors.createColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  scenario.situation,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    height: 1.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Challenge question
+          Text(
+            scenario.challenge,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Response input
+          if (state.feedback == null) ...[
+            TextField(
+              controller: responseController,
+              onChanged: onResponseChanged,
+              maxLines: 5,
+              minLines: 3,
+              decoration: const InputDecoration(
+                hintText:
+                    'Describe what you would do and why…',
+                filled: true,
+                fillColor: AppColors.surfaceVariant,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  borderSide: BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  borderSide: BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  borderSide:
+                      BorderSide(color: AppColors.createColor, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: state.isEvaluating
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : FilledButton.icon(
+                      onPressed: state.response.trim().isEmpty
+                          ? null
+                          : onSubmit,
+                      icon: const Icon(Icons.send),
+                      label: const Text('Submit my response'),
+                      style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.createColor),
+                    ),
+            ),
+          ],
+
+          // Feedback
+          if (state.feedback != null) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.lightbulb,
+                          size: 16, color: AppColors.createColor),
+                      SizedBox(width: 8),
+                      Text(
+                        'OTIC Feedback',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.createColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    state.feedback!,
+                    style: const TextStyle(
+                        color: AppColors.textPrimary, height: 1.6),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onNext,
+                icon: const Icon(Icons.refresh),
+                label: const Text('New scenario'),
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.createColor),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ── Shared utility widgets ────────────────────────────────────────────────────
+
+class _StartCard extends StatelessWidget {
+  const _StartCard({
+    required this.topic,
+    required this.color,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final String topic;
+  final Color color;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 40),
+            const SizedBox(height: 14),
+            Text(
+              topic,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: onTap,
+              icon: Icon(icon, size: 18),
+              label: Text(label),
+              style: FilledButton.styleFrom(backgroundColor: color),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingCard extends StatelessWidget {
+  const _LoadingCard({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Center(
+        child: Column(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(message,
+                style: const TextStyle(color: AppColors.textHint)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorCard extends StatelessWidget {
+  const _ErrorCard({required this.message, required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
       ),
     );
   }
