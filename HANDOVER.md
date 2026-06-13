@@ -110,6 +110,27 @@ in LiteRT-LM format for Android and GGUF Q4_K_M for desktop.
 
 ---
 
+## 5a. Reference values
+
+Public identifiers — safe to share. Use the certificate fingerprints to **verify**
+the keystore you received is the genuine one that signed the published releases.
+
+| Field | Value |
+|---|---|
+| Application ID / namespace | `com.otic.otic_studio` |
+| App label | `otic_studio` |
+| Current version | `1.1.0` (versionCode `2`) |
+| Signing cert subject | `CN=OTIC Studio, OU=Education, O=OTIC, L=Kampala, C=UG` |
+| Signing cert SHA-256 | `2f2952030977a45e843c1005e539fec73cc9b51bc26e9fb1c61105eacd53c01e` |
+| Signing cert SHA-1 | `6eb623487072e8f1193fabd9f5072ba1b1aed560` |
+
+Verify a keystore/APK matches with:
+```powershell
+apksigner verify --print-certs <apk>     # compare the printed SHA-256 to the above
+```
+
+---
+
 ## 6. Build, change, release — quick pointers
 
 - **Set up & run:** [CONTRIBUTING.md](CONTRIBUTING.md) (prerequisites, clone,
