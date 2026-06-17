@@ -17,12 +17,14 @@ The AI model (Gemma 3 1B) is bundled and runs locally: LiteRT-LM on Android, lla
 
 ## Downloads
 
-Get the latest build from the [**Releases page**](https://github.com/malinzijeremiah01-lab/Otic-Studio/releases/latest). Each release provides both:
+Get the latest build from the [**Releases page**](https://github.com/malinzijeremiah01-lab/Otic-Studio/releases/latest). The rolling **Otic Studio Latest Build** release is produced automatically from `main` and provides both:
 
 | Download | Platform | How to install |
 |---|---|---|
 | `Otic Studio vX.Y.Z.apk` | **Android phones/tablets** (4 GB RAM) | Copy to the device, open it, allow "Install unknown apps" |
 | `Otic Studio Windows vX.Y.Z.zip` | **Windows desktop** (8 GB RAM) | Extract anywhere, run `Otic Studio.exe` |
+
+Current automated artifact names are `Otic Studio Latest.apk` and `Otic Studio Windows Latest.zip`.
 
 Both can also be shared offline by USB, Bluetooth, or a local server. The APK is signed with the official Otic Studio certificate (`CN=Otic Studio, O=OTIC, L=Kampala, C=UG`); Android rejects updates not signed with the same key.
 
@@ -36,7 +38,7 @@ The app is small; the AI tutor needs the **Gemma 3 1B model file (~1 GB)**, dist
 
 | Area | What it does |
 |---|---|
-| **Learn** | Ask anything; the AI mentors through Answer → Clarify → Practice → Apply → Create → Reflect |
+| **Learn** | Type `Ask Otic anything...`; the AI mentors through Answer → Clarify → Practice → Apply → Create → Reflect |
 | **Practice** | AI-generated multiple-choice exercises with feedback and scoring |
 | **Apply** | Real-world scenario challenges with open-ended AI evaluation |
 | **Create** | Build projects (essay, business plan, experiment, story, code plan) guided step by step |
@@ -181,7 +183,7 @@ Toolchain specifics (paths, signing, build quirks, disk-space notes) are documen
 
 ## Design Principles
 
-- **Ground answers, don't invent** — OTIC builds on what the student already knows from prior sessions.
+- **Ground answers, don't invent** — Otic builds on what the student already knows from prior sessions.
 - **Never store audio or full logs** — only compressed text summaries persist.
 - **Fail visibly** — a missing, corrupt, or truncated model shows a clear actionable screen, never a silent crash.
 - **Offline is non-negotiable** — every dependency is verified to work with zero connectivity before it ships.
