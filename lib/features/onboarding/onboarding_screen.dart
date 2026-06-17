@@ -67,77 +67,88 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Progress dots
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  4,
-                  (i) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _page == i ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _page == i ? AppColors.primary : AppColors.border,
-                      borderRadius: BorderRadius.circular(4),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFFFBEB), Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Progress dots
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    4,
+                    (i) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: _page == i ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _page == i
+                            ? AppColors.primary
+                            : AppColors.border,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (i) => setState(() => _page = i),
-                children: [
-                  _NamePage(controller: _nameController),
-                  _AgePage(
-                    age: _age,
-                    grade: _grade,
-                    onAge: (v) => setState(() => _age = v),
-                    onGrade: (v) => setState(() => _grade = v),
-                  ),
-                  _InterestsPage(
-                    selected: _interests,
-                    onToggle: (s) => setState(
-                      () => _interests.contains(s)
-                          ? _interests.remove(s)
-                          : _interests.add(s),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (i) => setState(() => _page = i),
+                  children: [
+                    _NamePage(controller: _nameController),
+                    _AgePage(
+                      age: _age,
+                      grade: _grade,
+                      onAge: (v) => setState(() => _age = v),
+                      onGrade: (v) => setState(() => _grade = v),
                     ),
-                  ),
-                  _StylePage(
-                    selected: _learningStyle,
-                    onSelect: (s) => setState(() => _learningStyle = s),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saving ? null : _next,
-                  child: _saving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(_page < 3 ? 'Continue' : 'Start learning'),
+                    _InterestsPage(
+                      selected: _interests,
+                      onToggle: (s) => setState(
+                        () => _interests.contains(s)
+                            ? _interests.remove(s)
+                            : _interests.add(s),
+                      ),
+                    ),
+                    _StylePage(
+                      selected: _learningStyle,
+                      onSelect: (s) => setState(() => _learningStyle = s),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saving ? null : _next,
+                    child: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(_page < 3 ? 'Continue' : 'Start learning'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -158,21 +169,18 @@ class _NamePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Icon(
-              Icons.waving_hand,
-              color: AppColors.primary,
-              size: 32,
-            ),
+          Image.asset(
+            'assets/branding/otic_logo.png',
+            width: 88,
+            height: 88,
+            fit: BoxFit.contain,
+            semanticLabel: 'Logo',
           ),
           const SizedBox(height: 24),
-          Text('Welcome', style: Theme.of(context).textTheme.headlineLarge),
+          Text(
+            'Welcome to Otic Studio',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
           const SizedBox(height: 8),
           const Text(
             'Your personal offline AI tutor. Everything stays on this device — no internet ever.',
@@ -293,18 +301,18 @@ class _InterestsPage extends StatelessWidget {
   final void Function(String) onToggle;
 
   static const _topics = [
-    ('Mathematics', Icons.calculate),
-    ('Physics', Icons.science),
-    ('Biology', Icons.biotech),
-    ('Chemistry', Icons.science_outlined),
-    ('Programming', Icons.code),
-    ('AI & Data', Icons.psychology),
-    ('Business', Icons.trending_up),
-    ('Agriculture', Icons.grass),
-    ('History', Icons.history_edu),
-    ('Geography', Icons.public),
-    ('English', Icons.menu_book),
-    ('Arts', Icons.palette),
+    ('Mathematics', Icons.calculate, Color(0xFF4F46E5)),
+    ('Physics', Icons.science, Color(0xFF0EA5E9)),
+    ('Biology', Icons.biotech, Color(0xFF10B981)),
+    ('Chemistry', Icons.science_outlined, Color(0xFFF59E0B)),
+    ('Programming', Icons.code, Color(0xFF6366F1)),
+    ('AI & Data', Icons.psychology, Color(0xFF7C3AED)),
+    ('Business', Icons.trending_up, Color(0xFFEA580C)),
+    ('Agriculture', Icons.grass, Color(0xFF22C55E)),
+    ('History', Icons.history_edu, Color(0xFF64748B)),
+    ('Geography', Icons.public, Color(0xFF14B8A6)),
+    ('English', Icons.menu_book, Color(0xFFEC4899)),
+    ('Arts', Icons.palette, Color(0xFFEAB308)),
   ];
 
   @override
@@ -326,7 +334,7 @@ class _InterestsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Pick as many as you like. Your paths will be personalised.',
+                  'Pick as many as you like. Otic will personalise your paths.',
                   style: TextStyle(color: AppColors.textSecondary, height: 1.6),
                 ),
               ],
@@ -341,19 +349,20 @@ class _InterestsPage extends StatelessWidget {
               childAspectRatio: 1.1,
               children: _topics.map((t) {
                 final isSelected = selected.contains(t.$1);
+                final color = t.$3;
                 return GestureDetector(
                   onTap: () => onToggle(t.$1),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary.withValues(alpha: 0.1)
-                          : AppColors.surfaceVariant,
+                          ? color.withValues(alpha: 0.14)
+                          : color.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: isSelected
-                            ? AppColors.primary
-                            : AppColors.border,
+                            ? color
+                            : color.withValues(alpha: 0.18),
                         width: isSelected ? 2 : 1,
                       ),
                     ),
@@ -363,8 +372,8 @@ class _InterestsPage extends StatelessWidget {
                         Icon(
                           t.$2,
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
+                              ? color
+                              : color.withValues(alpha: 0.72),
                           size: 26,
                         ),
                         const SizedBox(height: 6),
@@ -375,9 +384,7 @@ class _InterestsPage extends StatelessWidget {
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
+                            color: isSelected ? color : AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),
