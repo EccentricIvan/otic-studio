@@ -118,7 +118,7 @@ the keystore you received is the genuine one that signed the published releases.
 | Field | Value |
 |---|---|
 | Application ID / namespace | `com.otic.otic_studio` |
-| App label | `Otic` |
+| App label | `Otic Studio` |
 | Current version | `1.1.0` (versionCode `2`) |
 | Signing cert subject | `CN=Otic Studio, OU=Education, O=OTIC, L=Kampala, C=UG` |
 | Signing cert SHA-256 | `2f2952030977a45e843c1005e539fec73cc9b51bc26e9fb1c61105eacd53c01e` |
