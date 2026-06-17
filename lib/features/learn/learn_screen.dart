@@ -350,10 +350,12 @@ class _TutorBubble extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.auto_stories,
-                    size: 13,
-                    color: AppColors.textHint,
+                  Image.asset(
+                    'assets/branding/otic_logo.png',
+                    width: 13,
+                    height: 13,
+                    fit: BoxFit.contain,
+                    semanticLabel: 'Logo',
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -529,18 +531,12 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 40),
-          Container(
+          Image.asset(
+            'assets/branding/otic_logo.png',
             width: 72,
             height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.learnColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.auto_stories,
-              color: AppColors.learnColor,
-              size: 36,
-            ),
+            fit: BoxFit.contain,
+            semanticLabel: 'Logo',
           ),
           const SizedBox(height: 20),
           Text(

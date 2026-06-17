@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to OTIC Studio are documented here.
+All notable changes to Otic Studio are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -48,7 +48,7 @@ First production release. Both Android (APK) and Windows (zip) builds published.
 - **Emotional safety engine** — offline frustration/distress detection; crisis messages bypass the model.
 - **Model setup** — in-app **Install from file…** flow with validation and a progress bar.
 - **Offline update tooling** — [tools/make_update_package.ps1](tools/make_update_package.ps1) builds a USB/LAN update bundle.
-- **Android release signing** — signed with the OTIC Studio keystore; ProGuard rules for MediaPipe/LiteRT-LM.
+- **Android release signing** — signed with the Otic Studio keystore; ProGuard rules for MediaPipe/LiteRT-LM.
 
 ### Changed
 - Replaced `google_fonts` (which fetched fonts over the network) with bundled font files to guarantee identical offline rendering.

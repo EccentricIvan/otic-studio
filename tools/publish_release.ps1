@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Publishes an OTIC Studio GitHub release with both the Android APK and the
+  Publishes an Otic Studio GitHub release with both the Android APK and the
   Windows desktop zip attached.
 
 .DESCRIPTION
@@ -50,7 +50,7 @@ if ($LASTEXITCODE -ne 0) {
 # --- Publish -----------------------------------------------------------------
 Write-Host "Publishing $tag with APK + Windows zip..." -ForegroundColor Green
 gh release create $tag $apk $zip `
-  --title "OTIC Studio $tag" `
+  --title "Otic Studio $tag" `
   --notes-file $notes
 
 Write-Host "Done. Release page: " -NoNewline

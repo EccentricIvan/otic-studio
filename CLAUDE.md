@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-OTIC Studio is a **fully offline AI-powered Learning Operating System**. It runs entirely on-device — no internet, no cloud, no external APIs, ever. The AI model (Gemma 3 1B in Phase 1, Gemma 4 in Phase 2) is bundled and runs locally:
+Otic Studio is a **fully offline AI-powered Learning Operating System**. It runs entirely on-device — no internet, no cloud, no external APIs, ever. The AI model (Gemma 3 1B in Phase 1, Gemma 4 in Phase 2) is bundled and runs locally:
 
 - **Android** → LiteRT-LM (Google's on-device LLM runtime, formerly MediaPipe LLM Inference) with GPU/NPU acceleration
 - **Windows / Linux** → llama.cpp via GGUF 4-bit quantized model, called through `dart:ffi`

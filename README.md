@@ -22,7 +22,7 @@ Get the latest build from the [**Releases page**](https://github.com/malinzijere
 | Download | Platform | How to install |
 |---|---|---|
 | `otic-studio-vX.Y.Z.apk` | **Android phones/tablets** (4 GB RAM) | Copy to the device, open it, allow "Install unknown apps" |
-| `otic-studio-windows-vX.Y.Z.zip` | **Windows desktop** (8 GB RAM) | Extract anywhere, run `otic_studio.exe` |
+| `otic-studio-windows-vX.Y.Z.zip` | **Windows desktop** (8 GB RAM) | Extract anywhere, run `Otic Studio.exe` |
 
 Both can also be shared offline by USB, Bluetooth, or a local server. The APK is signed with the official Otic Studio certificate (`CN=Otic Studio, O=OTIC, L=Kampala, C=UG`); Android rejects updates not signed with the same key.
 

@@ -1,6 +1,6 @@
 # Releasing
 
-How to build, sign, and publish an OTIC Studio release, and how to make an
+How to build, sign, and publish an Otic Studio release, and how to make an
 offline update bundle for schools. Written for Windows + PowerShell.
 
 ---
@@ -62,7 +62,7 @@ $bt = Get-ChildItem D:\Android\build-tools | Sort-Object Name -Descending | Sele
 & "$($bt.FullName)\apksigner.bat" verify --print-certs D:\otic-studio-v1.1.0.apk
 ```
 
-Expect: `CN=OTIC Studio, OU=Education, O=OTIC, L=Kampala, C=UG`. Android only
+Expect: `CN=Otic Studio, OU=Education, O=OTIC, L=Kampala, C=UG`. Android only
 accepts updates signed with this same key.
 
 ---
@@ -88,7 +88,7 @@ This persists; subsequent releases don't need it again.
 gh release create v1.1.0 `
   D:\otic-studio-v1.1.0.apk `
   D:\otic-studio-windows-v1.1.0.zip `
-  --title "OTIC Studio v1.1.0 — Website Builder" `
+  --title "Otic Studio v1.1.0 — Website Builder" `
   --notes-file dist\release-notes-v1.1.0.md
 ```
 

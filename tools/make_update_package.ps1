@@ -1,4 +1,4 @@
-# OTIC Studio — offline update package builder
+# Otic Studio — offline update package builder
 #
 # Builds release artifacts and zips them into a dated update package
 # you can copy to a USB drive or a local school server. No internet
@@ -41,11 +41,11 @@ if ($Target -in @('apk', 'both')) {
 
 # Instructions that travel with the package
 @"
-OTIC Studio update package — $stamp
+Otic Studio update package — $stamp
 
 WINDOWS
   1. Copy the zip to the target PC and extract anywhere (e.g. C:\OTIC).
-  2. Run otic_studio.exe. Student data is stored separately in
+  2. Run Otic Studio.exe. Student data is stored separately in
      Documents and is preserved across updates.
 
 ANDROID

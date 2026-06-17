@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-/// Discovers other OTIC Studio learners on the same local network.
+/// Discovers other Otic Studio learners on the same local network.
 ///
 /// Uses UDP broadcast on the school LAN/Wi-Fi — no internet, no server.
 /// Every device announces itself every few seconds; peers that go quiet

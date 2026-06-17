@@ -1,6 +1,6 @@
-# Project Handover — OTIC Studio
+# Project Handover — Otic Studio
 
-This document is for the team taking over maintenance of OTIC Studio. It lists
+This document is for the team taking over maintenance of Otic Studio. It lists
 everything needed to build, change, release, and maintain the app, and points to
 the deeper docs for each topic. If you read one file first, read this one.
 
@@ -9,7 +9,7 @@ builds are published on the [Releases page](https://github.com/malinzijeremiah01
 
 ---
 
-## 1. What OTIC Studio is
+## 1. What Otic Studio is
 
 A **fully offline** AI learning app for students — the Gemma AI model runs on the
 device, with no internet, cloud, or accounts. One Flutter codebase targets Android
@@ -30,7 +30,7 @@ and Windows/Linux desktop. See [README.md](README.md) for the feature list and
 | **Architecture & decisions** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/ENGINEERING_LOG.md](docs/ENGINEERING_LOG.md) | In the repo |
 | **Release process** | [docs/RELEASING.md](docs/RELEASING.md) | In the repo |
 | **Version history** | [CHANGELOG.md](CHANGELOG.md) | In the repo |
-| **Product requirements** | `OTIC Studio PRD.pdf` / `.docx` | In the repo |
+| **Product requirements** | `Otic Studio PRD.pdf` / `.docx` | In the repo |
 | **🔑 Android signing keystore** | NOT in the repo — held by the original developer | Must be transferred **securely** (see §4) |
 | **🤖 AI model file (~1 GB)** | NOT in the repo — distributed by USB/server | Obtain from the original developer (see §5) |
 
@@ -62,7 +62,7 @@ git clone https://github.com/malinzijeremiah01-lab/Otic-Studio.git
 
 ## 4. The Android signing keystore (most important handover item)
 
-The keystore is what proves an update is genuinely "OTIC Studio." It is **not in
+The keystore is what proves an update is genuinely "Otic Studio." It is **not in
 the repo** (correctly — it must never be public). It is currently at:
 
 ```
@@ -118,9 +118,9 @@ the keystore you received is the genuine one that signed the published releases.
 | Field | Value |
 |---|---|
 | Application ID / namespace | `com.otic.otic_studio` |
-| App label | `otic_studio` |
+| App label | `Otic` |
 | Current version | `1.1.0` (versionCode `2`) |
-| Signing cert subject | `CN=OTIC Studio, OU=Education, O=OTIC, L=Kampala, C=UG` |
+| Signing cert subject | `CN=Otic Studio, OU=Education, O=OTIC, L=Kampala, C=UG` |
 | Signing cert SHA-256 | `2f2952030977a45e843c1005e539fec73cc9b51bc26e9fb1c61105eacd53c01e` |
 | Signing cert SHA-1 | `6eb623487072e8f1193fabd9f5072ba1b1aed560` |
 
