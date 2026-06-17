@@ -26,7 +26,7 @@ if ($Target -in @('windows', 'both')) {
     if ($LASTEXITCODE -ne 0) { throw 'Windows build failed' }
     $winOut = Join-Path $root 'build\windows\x64\runner\Release'
     Compress-Archive -Path "$winOut\*" `
-        -DestinationPath (Join-Path $outDir "otic-studio-windows-$stamp.zip") -Force
+        -DestinationPath (Join-Path $outDir "Otic Studio Windows $stamp.zip") -Force
     Write-Host "Windows package ready" -ForegroundColor Green
 }
 
@@ -35,7 +35,7 @@ if ($Target -in @('apk', 'both')) {
     & $flutter build apk --release
     if ($LASTEXITCODE -ne 0) { throw 'APK build failed' }
     Copy-Item (Join-Path $root 'build\app\outputs\flutter-apk\app-release.apk') `
-        (Join-Path $outDir "otic-studio-$stamp.apk")
+        (Join-Path $outDir "Otic Studio $stamp.apk")
     Write-Host "APK package ready" -ForegroundColor Green
 }
 

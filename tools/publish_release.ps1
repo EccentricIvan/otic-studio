@@ -13,7 +13,7 @@
   Marketing version without the leading 'v', e.g. 1.1.0
 
 .PARAMETER ArtifactDir
-  Folder holding otic-studio-v<Version>.apk and otic-studio-windows-v<Version>.zip
+  Folder holding Otic Studio v<Version>.apk and Otic Studio Windows v<Version>.zip
   (default: D:\)
 
 .EXAMPLE
@@ -28,8 +28,8 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $tag      = "v$Version"
-$apk      = Join-Path $ArtifactDir "otic-studio-v$Version.apk"
-$zip      = Join-Path $ArtifactDir "otic-studio-windows-v$Version.zip"
+$apk      = Join-Path $ArtifactDir "Otic Studio v$Version.apk"
+$zip      = Join-Path $ArtifactDir "Otic Studio Windows v$Version.zip"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $notes    = Join-Path $repoRoot "dist\release-notes-v$Version.md"
 

@@ -38,13 +38,13 @@ jobs:
       - name: Prepare APK
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk dist/otic-studio-latest.apk
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/Otic Studio Latest.apk"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: otic-studio-latest-apk
-          path: dist/otic-studio-latest.apk
+          name: Otic Studio Latest APK
+          path: dist/Otic Studio Latest.apk
           if-no-files-found: error
 
   build-windows:
@@ -74,13 +74,13 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "dist\otic-studio-windows-latest.zip" -Force
+          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "dist\Otic Studio Windows Latest.zip" -Force
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: otic-studio-windows-latest
-          path: dist/otic-studio-windows-latest.zip
+          name: Otic Studio Windows Latest
+          path: dist/Otic Studio Windows Latest.zip
           if-no-files-found: error
 
   publish-latest:
@@ -96,14 +96,21 @@ jobs:
       - name: Flatten artifacts
         run: |
           find dist -type f -maxdepth 3 -print
-          cp dist/otic-studio-latest-apk/otic-studio-latest.apk ./otic-studio-latest.apk
-          cp dist/otic-studio-windows-latest/otic-studio-windows-latest.zip ./otic-studio-windows-latest.zip
+          cp "dist/Otic Studio Latest APK/Otic Studio Latest.apk" "./Otic Studio Latest.apk"
+          cp "dist/Otic Studio Windows Latest/Otic Studio Windows Latest.zip" "./Otic Studio Windows Latest.zip"
 
       - name: Update rolling release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if ! gh release view latest-build --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create latest-build               --repo "$GITHUB_REPOSITORY"               --title "Otic Studio Latest Build"               --notes "Automatically built APK and Windows zip from the latest main branch."
+            gh release create latest-build \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Otic Studio Latest Build" \
+              --notes "Automatically built APK and Windows zip from the latest main branch."
           fi
-          gh release upload latest-build             otic-studio-latest.apk             otic-studio-windows-latest.zip             --repo "$GITHUB_REPOSITORY"             --clobber
+          gh release upload latest-build \
+            "Otic Studio Latest.apk" \
+            "Otic Studio Windows Latest.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber

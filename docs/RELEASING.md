@@ -41,14 +41,14 @@ $env:TEMP='D:\temp'; $env:TMP='D:\temp'
 # Desktop
 flutter build windows --release
 Compress-Archive -Path build\windows\x64\runner\Release\* `
-  -DestinationPath D:\otic-studio-windows-v1.1.0.zip -Force
+  -DestinationPath D:\Otic Studio Windows v1.1.0.zip -Force
 
 # Free C: before the APK build (the windows tree is ~1 GB and regenerable)
 Remove-Item build\windows -Recurse -Force
 
 # Android (signed)
 flutter build apk --release
-Copy-Item build\app\outputs\flutter-apk\app-release.apk D:\otic-studio-v1.1.0.apk
+Copy-Item build\app\outputs\flutter-apk\app-release.apk D:\Otic Studio v1.1.0.apk
 ```
 
 > Keep large outputs on **D:**. After releasing, delete `build/` to reclaim C:.
@@ -59,7 +59,7 @@ Copy-Item build\app\outputs\flutter-apk\app-release.apk D:\otic-studio-v1.1.0.ap
 
 ```powershell
 $bt = Get-ChildItem D:\Android\build-tools | Sort-Object Name -Descending | Select-Object -First 1
-& "$($bt.FullName)\apksigner.bat" verify --print-certs D:\otic-studio-v1.1.0.apk
+& "$($bt.FullName)\apksigner.bat" verify --print-certs D:\Otic Studio v1.1.0.apk
 ```
 
 Expect: `CN=Otic Studio, OU=Education, O=OTIC, L=Kampala, C=UG`. Android only
@@ -86,8 +86,8 @@ This persists; subsequent releases don't need it again.
 
 ```powershell
 gh release create v1.1.0 `
-  D:\otic-studio-v1.1.0.apk `
-  D:\otic-studio-windows-v1.1.0.zip `
+  D:\Otic Studio v1.1.0.apk `
+  D:\Otic Studio Windows v1.1.0.zip `
   --title "Otic Studio v1.1.0 — Website Builder" `
   --notes-file dist\release-notes-v1.1.0.md
 ```
