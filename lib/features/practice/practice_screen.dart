@@ -48,12 +48,7 @@ class PracticeScreen extends StatelessWidget {
           ),
         ),
         body: const MaxWidth(
-          child: TabBarView(
-            children: [
-              _PracticeTab(),
-              _ApplyTab(),
-            ],
-          ),
+          child: TabBarView(children: [_PracticeTab(), _ApplyTab()]),
         ),
       ),
     );
@@ -77,8 +72,8 @@ class _TopicPicker extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Merge student interests with fixed topic list
     final studentAsync = ref.watch(activeStudentProvider);
-    final studentInterests = studentAsync.valueOrNull
-            ?.interestsJson
+    final studentInterests =
+        studentAsync.valueOrNull?.interestsJson
             .replaceAll('[', '')
             .replaceAll(']', '')
             .replaceAll('"', '')
@@ -121,12 +116,10 @@ class _TopicPicker extends ConsumerWidget {
                 selected: isSelected,
                 onSelected: (_) => onSelect(topic),
                 selectedColor: color.withValues(alpha: 0.15),
-                side: BorderSide(
-                    color: isSelected ? color : AppColors.border),
+                side: BorderSide(color: isSelected ? color : AppColors.border),
                 labelStyle: TextStyle(
                   color: isSelected ? color : AppColors.textSecondary,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
                 checkmarkColor: color,
               );
@@ -161,7 +154,9 @@ class _PracticeTab extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 16),
-          if (state.topic.isNotEmpty && state.exercise == null && !state.isGenerating)
+          if (state.topic.isNotEmpty &&
+              state.exercise == null &&
+              !state.isGenerating)
             _StartCard(
               topic: state.topic,
               color: AppColors.practiceColor,
@@ -169,7 +164,8 @@ class _PracticeTab extends ConsumerWidget {
               label: 'Generate exercise',
               onTap: () => ref.read(practiceProvider.notifier).generate(),
             ),
-          if (state.isGenerating) const _LoadingCard(message: 'Creating exercise…'),
+          if (state.isGenerating)
+            const _LoadingCard(message: 'Creating exercise…'),
           if (state.error != null)
             _ErrorCard(
               message: state.error!,
@@ -221,7 +217,11 @@ class _ExerciseCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.stars, size: 16, color: AppColors.practiceColor),
+                const Icon(
+                  Icons.stars,
+                  size: 16,
+                  color: AppColors.practiceColor,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Score: ${state.score}/${state.total}',
@@ -238,9 +238,10 @@ class _ExerciseCard extends StatelessWidget {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text('Reset',
-                      style: TextStyle(
-                          fontSize: 12, color: AppColors.textHint)),
+                  child: const Text(
+                    'Reset',
+                    style: TextStyle(fontSize: 12, color: AppColors.textHint),
+                  ),
                 ),
               ],
             ),
@@ -261,14 +262,14 @@ class _ExerciseCard extends StatelessWidget {
 
           // Options
           ...exercise.options.asMap().entries.map(
-                (e) => _OptionButton(
-                  label: _letter(e.key),
-                  text: e.value,
-                  index: e.key,
-                  state: state,
-                  onTap: () => onAnswer(e.key),
-                ),
-              ),
+            (e) => _OptionButton(
+              label: _letter(e.key),
+              text: e.value,
+              index: e.key,
+              state: state,
+              onTap: () => onAnswer(e.key),
+            ),
+          ),
 
           // Feedback
           if (state.answered) ...[
@@ -291,8 +292,7 @@ class _ExerciseCard extends StatelessWidget {
                 children: [
                   Icon(
                     state.correct ? Icons.check_circle : Icons.cancel,
-                    color:
-                        state.correct ? AppColors.teachColor : Colors.red,
+                    color: state.correct ? AppColors.teachColor : Colors.red,
                     size: 20,
                   ),
                   const SizedBox(width: 10),
@@ -331,7 +331,8 @@ class _ExerciseCard extends StatelessWidget {
                 icon: const Icon(Icons.arrow_forward),
                 label: const Text('Next question'),
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.practiceColor),
+                  backgroundColor: AppColors.practiceColor,
+                ),
               ),
             ),
           ],
@@ -476,8 +477,7 @@ class _ApplyTabState extends ConsumerState<_ApplyTab> {
               color: AppColors.createColor,
               icon: Icons.explore,
               label: 'Give me a scenario',
-              onTap: () =>
-                  ref.read(applyProvider.notifier).generateScenario(),
+              onTap: () => ref.read(applyProvider.notifier).generateScenario(),
             ),
 
           if (state.isGeneratingScenario)
@@ -497,10 +497,8 @@ class _ApplyTabState extends ConsumerState<_ApplyTab> {
               responseController: _responseController,
               onResponseChanged: (t) =>
                   ref.read(applyProvider.notifier).setResponse(t),
-              onSubmit: () =>
-                  ref.read(applyProvider.notifier).evaluate(),
-              onNext: () =>
-                  ref.read(applyProvider.notifier).nextScenario(),
+              onSubmit: () => ref.read(applyProvider.notifier).evaluate(),
+              onNext: () => ref.read(applyProvider.notifier).nextScenario(),
             ),
 
           const SizedBox(height: 40),
@@ -541,15 +539,19 @@ class _ScenarioCard extends StatelessWidget {
               color: AppColors.createColor.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: AppColors.createColor.withValues(alpha: 0.2)),
+                color: AppColors.createColor.withValues(alpha: 0.2),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.place, size: 15,
-                        color: AppColors.createColor.withValues(alpha: 0.8)),
+                    Icon(
+                      Icons.place,
+                      size: 15,
+                      color: AppColors.createColor.withValues(alpha: 0.8),
+                    ),
                     const SizedBox(width: 6),
                     const Text(
                       'SCENARIO',
@@ -595,8 +597,7 @@ class _ScenarioCard extends StatelessWidget {
               maxLines: 5,
               minLines: 3,
               decoration: const InputDecoration(
-                hintText:
-                    'Describe what you would do and why…',
+                hintText: 'Describe what you would do and why…',
                 filled: true,
                 fillColor: AppColors.surfaceVariant,
                 border: OutlineInputBorder(
@@ -609,8 +610,10 @@ class _ScenarioCard extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
-                  borderSide:
-                      BorderSide(color: AppColors.createColor, width: 2),
+                  borderSide: BorderSide(
+                    color: AppColors.createColor,
+                    width: 2,
+                  ),
                 ),
               ),
             ),
@@ -631,7 +634,8 @@ class _ScenarioCard extends StatelessWidget {
                       icon: const Icon(Icons.send),
                       label: const Text('Submit my response'),
                       style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.createColor),
+                        backgroundColor: AppColors.createColor,
+                      ),
                     ),
             ),
           ],
@@ -650,11 +654,14 @@ class _ScenarioCard extends StatelessWidget {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.lightbulb,
-                          size: 16, color: AppColors.createColor),
+                      Icon(
+                        Icons.lightbulb,
+                        size: 16,
+                        color: AppColors.createColor,
+                      ),
                       SizedBox(width: 8),
                       Text(
-                        'OTIC Feedback',
+                        'AI Feedback',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.createColor,
@@ -666,7 +673,9 @@ class _ScenarioCard extends StatelessWidget {
                   Text(
                     state.feedback!,
                     style: const TextStyle(
-                        color: AppColors.textPrimary, height: 1.6),
+                      color: AppColors.textPrimary,
+                      height: 1.6,
+                    ),
                   ),
                 ],
               ),
@@ -679,7 +688,8 @@ class _ScenarioCard extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text('New scenario'),
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.createColor),
+                  backgroundColor: AppColors.createColor,
+                ),
               ),
             ),
           ],
@@ -757,8 +767,7 @@ class _LoadingCard extends StatelessWidget {
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text(message,
-                style: const TextStyle(color: AppColors.textHint)),
+            Text(message, style: const TextStyle(color: AppColors.textHint)),
           ],
         ),
       ),

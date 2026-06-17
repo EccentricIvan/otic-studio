@@ -56,15 +56,14 @@ class _CreateState {
     bool? isGenerating,
     String? streamingText,
     int? savedProjectId,
-  }) =>
-      _CreateState(
-        projectType: projectType ?? this.projectType,
-        topic: topic ?? this.topic,
-        messages: messages ?? this.messages,
-        isGenerating: isGenerating ?? this.isGenerating,
-        streamingText: streamingText ?? this.streamingText,
-        savedProjectId: savedProjectId ?? this.savedProjectId,
-      );
+  }) => _CreateState(
+    projectType: projectType ?? this.projectType,
+    topic: topic ?? this.topic,
+    messages: messages ?? this.messages,
+    isGenerating: isGenerating ?? this.isGenerating,
+    streamingText: streamingText ?? this.streamingText,
+    savedProjectId: savedProjectId ?? this.savedProjectId,
+  );
 }
 
 class _Msg {
@@ -82,7 +81,8 @@ class _CreateNotifier extends AutoDisposeNotifier<_CreateState> {
 
   Future<void> start() async {
     if (state.projectType.isEmpty || state.topic.isEmpty) return;
-    final intro = 'I want to create a ${state.projectType} about ${state.topic}.';
+    final intro =
+        'I want to create a ${state.projectType} about ${state.topic}.';
     await _send(intro);
   }
 
@@ -91,22 +91,26 @@ class _CreateNotifier extends AutoDisposeNotifier<_CreateState> {
   Future<void> _send(String userText) async {
     final msgs = [...state.messages, _Msg(text: userText, isUser: true)];
     state = state.copyWith(
-        messages: msgs, isGenerating: true, streamingText: '');
+      messages: msgs,
+      isGenerating: true,
+      streamingText: '',
+    );
 
     try {
       final engine = await ref.read(engineLoadedProvider.future);
       final history = state.messages
-          .map((m) => '${m.isUser ? 'Student' : 'OTIC'}: ${m.text}')
+          .map((m) => '${m.isUser ? 'Student' : 'Tutor'}: ${m.text}')
           .join('\n');
 
-      final prompt = '''You are OTIC, a creative project mentor.
+      final prompt =
+          '''You are a creative project mentor.
 Help the student build a ${state.projectType} about "${state.topic}".
 Guide them one step at a time: plan → draft → review.
 Ask one clear question or give one clear instruction. Be encouraging.
 Keep responses concise (3-5 sentences max).
 
 ${history.isNotEmpty ? 'Conversation so far:\n$history\n' : ''}Student: $userText
-OTIC:''';
+Tutor:''';
 
       String streamed = '';
       final response = await engine.generate(
@@ -120,7 +124,10 @@ OTIC:''';
       );
 
       state = state.copyWith(
-        messages: [...state.messages, _Msg(text: response, isUser: false)],
+        messages: [
+          ...state.messages,
+          _Msg(text: response, isUser: false),
+        ],
         isGenerating: false,
         streamingText: '',
       );
@@ -135,7 +142,9 @@ OTIC:''';
 
     final db = ref.read(dbProvider);
     final stepsJson = jsonEncode(
-      state.messages.map((m) => {'role': m.isUser ? 'user' : 'otic', 'text': m.text}).toList(),
+      state.messages
+          .map((m) => {'role': m.isUser ? 'user' : 'otic', 'text': m.text})
+          .toList(),
     );
 
     final title = '${state.projectType}: ${state.topic}';
@@ -155,26 +164,30 @@ OTIC:''';
     state = state.copyWith(savedProjectId: id);
 
     // Award badge
-    final badges =
-        await ref.read(badgeServiceProvider).onProjectSaved(student.id);
+    final badges = await ref
+        .read(badgeServiceProvider)
+        .onProjectSaved(student.id);
     ref.invalidate(studentProjectsProvider(student.id));
 
     if (context.mounted) {
       final badgeMsg = badges.isNotEmpty
           ? '\n🏅 Badge earned: ${badges.first.name}!'
           : '';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Project saved!$badgeMsg'),
-        backgroundColor: AppColors.teachColor,
-        duration: const Duration(seconds: 3),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Project saved!$badgeMsg'),
+          backgroundColor: AppColors.teachColor,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 }
 
 final _createProvider =
     AutoDisposeNotifierProvider<_CreateNotifier, _CreateState>(
-        _CreateNotifier.new);
+      _CreateNotifier.new,
+    );
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -216,17 +229,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.started
-            ? '${state.projectType}: ${state.topic}'
-            : 'Create'),
+        title: Text(
+          state.started ? '${state.projectType}: ${state.topic}' : 'Create',
+        ),
         actions: [
           if (state.started && state.savedProjectId == null)
             TextButton.icon(
               onPressed: state.isGenerating
                   ? null
-                  : () => ref
-                      .read(_createProvider.notifier)
-                      .saveProject(context),
+                  : () =>
+                        ref.read(_createProvider.notifier).saveProject(context),
               icon: const Icon(Icons.save_outlined),
               label: const Text('Save'),
             ),
@@ -238,7 +250,14 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             ),
         ],
       ),
-      body: state.started ? _ChatView(state: state, scrollController: _scrollController, messageController: _messageController, onScrollToBottom: _scrollToBottom) : _SetupView(topicController: _topicController),
+      body: state.started
+          ? _ChatView(
+              state: state,
+              scrollController: _scrollController,
+              messageController: _messageController,
+              onScrollToBottom: _scrollToBottom,
+            )
+          : _SetupView(topicController: _topicController),
     );
   }
 }
@@ -260,99 +279,109 @@ class _SetupView extends ConsumerWidget {
       padding: const EdgeInsets.all(24),
       child: MaxWidth(
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          Text('What do you want to create?',
-              style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 6),
-          const Text('OTIC will guide you step by step.',
-              style: TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: 28),
-          const Text('Project type',
-              style: TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: cols,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 2.4,
-            children: _projectTypes.map((pt) {
-              final selected = state.projectType == pt.label;
-              return GestureDetector(
-                onTap: () =>
-                    ref.read(_createProvider.notifier).setType(pt.label),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? AppColors.createColor.withValues(alpha: 0.1)
-                        : AppColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Text(
+              'What do you want to create?',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Your AI mentor will guide you step by step.',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 28),
+            const Text(
+              'Project type',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            GridView.count(
+              crossAxisCount: cols,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 2.4,
+              children: _projectTypes.map((pt) {
+                final selected = state.projectType == pt.label;
+                return GestureDetector(
+                  onTap: () =>
+                      ref.read(_createProvider.notifier).setType(pt.label),
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: selected
-                          ? AppColors.createColor
-                          : AppColors.border,
-                      width: selected ? 2 : 1,
+                          ? AppColors.createColor.withValues(alpha: 0.1)
+                          : AppColors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: selected
+                            ? AppColors.createColor
+                            : AppColors.border,
+                        width: selected ? 2 : 1,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(pt.icon,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          pt.icon,
                           size: 18,
                           color: selected
                               ? AppColors.createColor
-                              : AppColors.textSecondary),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          pt.label,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: selected
-                                ? AppColors.createColor
-                                : AppColors.textPrimary,
+                              : AppColors.textSecondary,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            pt.label,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: selected
+                                  ? AppColors.createColor
+                                  : AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 28),
+            const Text('Topic', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 10),
+            TextField(
+              controller: topicController,
+              onChanged: ref.read(_createProvider.notifier).setTopic,
+              decoration: const InputDecoration(
+                hintText: 'e.g. climate change, entrepreneurship, gravity…',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 28),
-          const Text('Topic', style: TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-          TextField(
-            controller: topicController,
-            onChanged: ref.read(_createProvider.notifier).setTopic,
-            decoration: const InputDecoration(
-              hintText: 'e.g. climate change, entrepreneurship, gravity…',
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              ),
             ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: state.projectType.isNotEmpty &&
-                      state.topic.trim().isNotEmpty
-                  ? () =>
-                      ref.read(_createProvider.notifier).start()
-                  : null,
-              icon: const Icon(Icons.auto_awesome),
-              label: const Text('Start creating with OTIC'),
-              style: FilledButton.styleFrom(
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed:
+                    state.projectType.isNotEmpty &&
+                        state.topic.trim().isNotEmpty
+                    ? () => ref.read(_createProvider.notifier).start()
+                    : null,
+                icon: const Icon(Icons.auto_awesome),
+                label: const Text('Start creating'),
+                style: FilledButton.styleFrom(
                   backgroundColor: AppColors.createColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16)),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
@@ -376,63 +405,78 @@ class _ChatView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allCount = state.messages.length +
+    final allCount =
+        state.messages.length +
         (state.isGenerating && state.streamingText.isNotEmpty ? 1 : 0);
 
     return MaxWidth(
-        child: Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            controller: scrollController,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            itemCount: allCount,
-            itemBuilder: (_, i) {
-              if (i == state.messages.length) {
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: allCount,
+              itemBuilder: (_, i) {
+                if (i == state.messages.length) {
+                  return _Bubble(
+                    text: state.streamingText,
+                    isUser: false,
+                    streaming: true,
+                  );
+                }
+                final m = state.messages[i];
                 return _Bubble(
-                    text: state.streamingText, isUser: false, streaming: true);
-              }
-              final m = state.messages[i];
-              return _Bubble(
-                  text: m.text, isUser: m.isUser, streaming: false);
-            },
-          ),
-        ),
-        if (state.savedProjectId != null)
-          Container(
-            color: AppColors.teachColor.withValues(alpha: 0.1),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: const Row(
-              children: [
-                Icon(Icons.check_circle, color: AppColors.teachColor, size: 18),
-                SizedBox(width: 8),
-                Text('Project saved!',
-                    style: TextStyle(
-                        color: AppColors.teachColor,
-                        fontWeight: FontWeight.w600)),
-              ],
+                  text: m.text,
+                  isUser: m.isUser,
+                  streaming: false,
+                );
+              },
             ),
           ),
-        _InputBar(
-          controller: messageController,
-          isLoading: state.isGenerating,
-          onSend: (text) {
-            messageController.clear();
-            ref.read(_createProvider.notifier).send(text);
-            onScrollToBottom();
-          },
-        ),
-      ],
+          if (state.savedProjectId != null)
+            Container(
+              color: AppColors.teachColor.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: AppColors.teachColor,
+                    size: 18,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Project saved!',
+                    style: TextStyle(
+                      color: AppColors.teachColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          _InputBar(
+            controller: messageController,
+            isLoading: state.isGenerating,
+            onSend: (text) {
+              messageController.clear();
+              ref.read(_createProvider.notifier).send(text);
+              onScrollToBottom();
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble(
-      {required this.text, required this.isUser, required this.streaming});
+  const _Bubble({
+    required this.text,
+    required this.isUser,
+    required this.streaming,
+  });
   final String text;
   final bool isUser;
   final bool streaming;
@@ -442,11 +486,11 @@ class _Bubble extends StatelessWidget {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.8),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.8,
+        ),
         margin: const EdgeInsets.only(bottom: 10),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: isUser ? AppColors.createColor : AppColors.surface,
           borderRadius: BorderRadius.circular(14),
@@ -472,7 +516,7 @@ class _Bubble extends StatelessWidget {
                 height: 10,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-            ]
+            ],
           ],
         ),
       ),
@@ -481,10 +525,11 @@ class _Bubble extends StatelessWidget {
 }
 
 class _InputBar extends StatelessWidget {
-  const _InputBar(
-      {required this.controller,
-      required this.isLoading,
-      required this.onSend});
+  const _InputBar({
+    required this.controller,
+    required this.isLoading,
+    required this.onSend,
+  });
   final TextEditingController controller;
   final bool isLoading;
   final void Function(String) onSend;
@@ -493,8 +538,9 @@ class _InputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: AppColors.border)),
-          color: AppColors.surface),
+        border: Border(top: BorderSide(color: AppColors.border)),
+        color: AppColors.surface,
+      ),
       padding: const EdgeInsets.fromLTRB(16, 10, 12, 14),
       child: Row(
         children: [
@@ -505,7 +551,7 @@ class _InputBar extends StatelessWidget {
                 if (t.trim().isNotEmpty) onSend(t.trim());
               },
               decoration: const InputDecoration(
-                hintText: 'Reply to OTIC…',
+                hintText: 'Reply...',
                 border: InputBorder.none,
               ),
               maxLines: 3,
@@ -517,9 +563,10 @@ class _InputBar extends StatelessWidget {
               ? const Padding(
                   padding: EdgeInsets.all(10),
                   child: SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.5)),
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
                 )
               : IconButton.filled(
                   onPressed: () {

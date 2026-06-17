@@ -63,7 +63,7 @@ const allBadges = <BadgeDef>[
   BadgeDef(
     id: 'teacher',
     name: 'The Teacher',
-    description: 'Taught a topic to OTIC and scored 80 or above',
+    description: 'Taught a topic and scored 80 or above',
     icon: Icons.school,
     color: AppColors.teachColor,
     points: 150,

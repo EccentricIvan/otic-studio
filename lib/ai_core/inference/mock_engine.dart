@@ -49,7 +49,7 @@ class MockEngine extends InferenceEngine {
     if (lower.contains('python') || lower.contains('code')) {
       return 'Great choice! Python is one of the most beginner-friendly languages. '
           'Let\'s start with the basics: a variable stores a value. '
-          'Try this: `name = "OTIC"` then `print(name)`. '
+          'Try this: `name = "Tutor"` then `print(name)`. '
           'What do you think will happen when you run it?';
     }
     if (lower.contains('entrepreneur')) {

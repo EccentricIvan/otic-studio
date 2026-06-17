@@ -42,17 +42,16 @@ class _TeachState {
     bool? isEvaluating,
     String? newBadge,
     bool clearScore = false,
-  }) =>
-      _TeachState(
-        topic: topic ?? this.topic,
-        explanation: explanation ?? this.explanation,
-        score: clearScore ? null : score ?? this.score,
-        strengths: strengths ?? this.strengths,
-        improve: improve ?? this.improve,
-        overall: overall ?? this.overall,
-        isEvaluating: isEvaluating ?? this.isEvaluating,
-        newBadge: newBadge ?? this.newBadge,
-      );
+  }) => _TeachState(
+    topic: topic ?? this.topic,
+    explanation: explanation ?? this.explanation,
+    score: clearScore ? null : score ?? this.score,
+    strengths: strengths ?? this.strengths,
+    improve: improve ?? this.improve,
+    overall: overall ?? this.overall,
+    isEvaluating: isEvaluating ?? this.isEvaluating,
+    newBadge: newBadge ?? this.newBadge,
+  );
 }
 
 class _TeachNotifier extends AutoDisposeNotifier<_TeachState> {
@@ -69,7 +68,8 @@ class _TeachNotifier extends AutoDisposeNotifier<_TeachState> {
 
     try {
       final engine = await ref.read(engineLoadedProvider.future);
-      final prompt = '''A student explained "${state.topic}" as follows:
+      final prompt =
+          '''A student explained "${state.topic}" as follows:
 "${state.explanation}"
 
 Score this explanation out of 100. Your response MUST follow this exact format:
@@ -118,18 +118,24 @@ Rate the explanation now:''';
     if (scoreMatch != null) {
       result['score'] = int.tryParse(scoreMatch.group(1) ?? '50') ?? 50;
     }
-    final strengthsMatch =
-        RegExp(r'STRENGTHS:\s*(.+)', caseSensitive: false).firstMatch(raw);
+    final strengthsMatch = RegExp(
+      r'STRENGTHS:\s*(.+)',
+      caseSensitive: false,
+    ).firstMatch(raw);
     if (strengthsMatch != null) {
       result['strengths'] = strengthsMatch.group(1)?.trim();
     }
-    final improveMatch =
-        RegExp(r'IMPROVE:\s*(.+)', caseSensitive: false).firstMatch(raw);
+    final improveMatch = RegExp(
+      r'IMPROVE:\s*(.+)',
+      caseSensitive: false,
+    ).firstMatch(raw);
     if (improveMatch != null) {
       result['improve'] = improveMatch.group(1)?.trim();
     }
-    final overallMatch =
-        RegExp(r'OVERALL:\s*(.+)', caseSensitive: false).firstMatch(raw);
+    final overallMatch = RegExp(
+      r'OVERALL:\s*(.+)',
+      caseSensitive: false,
+    ).firstMatch(raw);
     if (overallMatch != null) {
       result['overall'] = overallMatch.group(1)?.trim();
     }
@@ -139,9 +145,9 @@ Rate the explanation now:''';
   void reset() => state = _TeachState(topic: state.topic);
 }
 
-final _teachProvider =
-    AutoDisposeNotifierProvider<_TeachNotifier, _TeachState>(
-        _TeachNotifier.new);
+final _teachProvider = AutoDisposeNotifierProvider<_TeachNotifier, _TeachState>(
+  _TeachNotifier.new,
+);
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -172,160 +178,166 @@ class _TeachScreenState extends ConsumerState<TeachScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Teach'),
-        leading: const BackButton(),
-      ),
+      appBar: AppBar(title: const Text('Teach'), leading: const BackButton()),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: MaxWidth(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.teachColor.withValues(alpha: 0.07),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                    color: AppColors.teachColor.withValues(alpha: 0.2)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.school, color: AppColors.teachColor),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Explain a topic to OTIC. The better your explanation, the higher your score!',
-                      style: TextStyle(
-                          color: AppColors.textSecondary, height: 1.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            // Topic picker
-            const Text('Choose a topic',
-                style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            _TopicChips(
-              selected: state.topic,
-              onSelect: (t) {
-                ref.read(_teachProvider.notifier).setTopic(t);
-                _explController.clear();
-              },
-            ),
-            const SizedBox(height: 28),
-
-            if (state.topic.isNotEmpty && !state.hasResult) ...[
-              Text(
-                'Explain "${state.topic}" in your own words',
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600, fontSize: 16),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Write as if you are teaching a friend. Use examples.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _explController,
-                onChanged:
-                    ref.read(_teachProvider.notifier).setExplanation,
-                maxLines: 8,
-                minLines: 5,
-                decoration: const InputDecoration(
-                  hintText: 'Type your explanation here…',
-                  filled: true,
-                  fillColor: AppColors.surfaceVariant,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide:
-                        BorderSide(color: AppColors.teachColor, width: 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.teachColor.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.teachColor.withValues(alpha: 0.2),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: state.isEvaluating
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 10),
-                              Text('OTIC is evaluating your explanation…',
-                                  style: TextStyle(
-                                      color: AppColors.textHint)),
-                            ],
-                          ),
-                        ),
-                      )
-                    : FilledButton.icon(
-                        onPressed: state.explanation.trim().isEmpty
-                            ? null
-                            : () => ref
-                                .read(_teachProvider.notifier)
-                                .evaluate(),
-                        icon: const Icon(Icons.send),
-                        label: const Text('Submit for scoring'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.teachColor,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 14),
+                child: const Row(
+                  children: [
+                    Icon(Icons.school, color: AppColors.teachColor),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Explain a topic clearly. The better your explanation, the higher your score!',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          height: 1.5,
                         ),
                       ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+              const SizedBox(height: 28),
 
-            // Result
-            if (state.hasResult) ...[
-              _ScoreCard(state: state),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () =>
-                          ref.read(_teachProvider.notifier).reset(),
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Try again'),
+              // Topic picker
+              const Text(
+                'Choose a topic',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              _TopicChips(
+                selected: state.topic,
+                onSelect: (t) {
+                  ref.read(_teachProvider.notifier).setTopic(t);
+                  _explController.clear();
+                },
+              ),
+              const SizedBox(height: 28),
+
+              if (state.topic.isNotEmpty && !state.hasResult) ...[
+                Text(
+                  'Explain "${state.topic}" in your own words',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Write as if you are teaching a friend. Use examples.',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _explController,
+                  onChanged: ref.read(_teachProvider.notifier).setExplanation,
+                  maxLines: 8,
+                  minLines: 5,
+                  decoration: const InputDecoration(
+                    hintText: 'Type your explanation here…',
+                    filled: true,
+                    fillColor: AppColors.surfaceVariant,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(
+                        color: AppColors.teachColor,
+                        width: 2,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () {
-                        ref.read(_teachProvider.notifier).setTopic('');
-                        _explController.clear();
-                      },
-                      icon: const Icon(Icons.topic),
-                      label: const Text('New topic'),
-                      style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.teachColor),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: state.isEvaluating
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Your explanation is being evaluated...',
+                                  style: TextStyle(color: AppColors.textHint),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : FilledButton.icon(
+                          onPressed: state.explanation.trim().isEmpty
+                              ? null
+                              : () => ref
+                                    .read(_teachProvider.notifier)
+                                    .evaluate(),
+                          icon: const Icon(Icons.send),
+                          label: const Text('Submit for scoring'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.teachColor,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                ),
+              ],
 
-            const SizedBox(height: 40),
-          ],
-        ),
+              // Result
+              if (state.hasResult) ...[
+                _ScoreCard(state: state),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            ref.read(_teachProvider.notifier).reset(),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Try again'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          ref.read(_teachProvider.notifier).setTopic('');
+                          _explController.clear();
+                        },
+                        icon: const Icon(Icons.topic),
+                        label: const Text('New topic'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.teachColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -356,7 +368,8 @@ class _ScoreCard extends StatelessWidget {
               color: AppColors.teachColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: AppColors.teachColor.withValues(alpha: 0.3)),
+                color: AppColors.teachColor.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [
@@ -365,13 +378,17 @@ class _ScoreCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Badge Earned!',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.teachColor)),
-                    Text(state.newBadge,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary)),
+                    const Text(
+                      'Badge Earned!',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.teachColor,
+                      ),
+                    ),
+                    Text(
+                      state.newBadge,
+                      style: const TextStyle(color: AppColors.textSecondary),
+                    ),
                   ],
                 ),
               ],
@@ -404,20 +421,26 @@ class _ScoreCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _FeedbackRow(icon: Icons.check_circle_outline,
-                  color: AppColors.teachColor,
-                  label: 'Strengths',
-                  text: state.strengths),
+              _FeedbackRow(
+                icon: Icons.check_circle_outline,
+                color: AppColors.teachColor,
+                label: 'Strengths',
+                text: state.strengths,
+              ),
               const SizedBox(height: 12),
-              _FeedbackRow(icon: Icons.arrow_upward,
-                  color: AppColors.practiceColor,
-                  label: 'Improve',
-                  text: state.improve),
+              _FeedbackRow(
+                icon: Icons.arrow_upward,
+                color: AppColors.practiceColor,
+                label: 'Improve',
+                text: state.improve,
+              ),
               const SizedBox(height: 12),
-              _FeedbackRow(icon: Icons.auto_awesome,
-                  color: AppColors.createColor,
-                  label: 'Overall',
-                  text: state.overall),
+              _FeedbackRow(
+                icon: Icons.auto_awesome,
+                color: AppColors.createColor,
+                label: 'Overall',
+                text: state.overall,
+              ),
             ],
           ),
         ),
@@ -435,11 +458,12 @@ class _ScoreCard extends StatelessWidget {
 }
 
 class _FeedbackRow extends StatelessWidget {
-  const _FeedbackRow(
-      {required this.icon,
-      required this.color,
-      required this.label,
-      required this.text});
+  const _FeedbackRow({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.text,
+  });
   final IconData icon;
   final Color color;
   final String label;
@@ -456,15 +480,22 @@ class _FeedbackRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                      color: color)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  color: color,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(text,
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, height: 1.4)),
+              Text(
+                text,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
             ],
           ),
         ),
@@ -508,7 +539,8 @@ class _TopicChips extends StatelessWidget {
           onSelected: (_) => onSelect(t),
           selectedColor: AppColors.teachColor.withValues(alpha: 0.12),
           side: BorderSide(
-              color: sel ? AppColors.teachColor : AppColors.border),
+            color: sel ? AppColors.teachColor : AppColors.border,
+          ),
           labelStyle: TextStyle(
             color: sel ? AppColors.teachColor : AppColors.textSecondary,
             fontWeight: sel ? FontWeight.w600 : FontWeight.w400,

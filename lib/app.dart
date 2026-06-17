@@ -13,7 +13,7 @@ class OticApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      title: 'OTIC Studio',
+      title: 'Otic Studio',
       theme: AppTheme.light,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
@@ -30,9 +30,8 @@ class ModelGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final modelInfo = ref.watch(modelInfoProvider);
     return modelInfo.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (_, __) => child,
       data: (info) {
         if (info.status == ModelStatus.notInstalled) {

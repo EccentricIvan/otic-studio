@@ -18,164 +18,196 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: MaxWidth(
-          maxWidth: 760,
-          child: ListView(
-        children: [
-          // ── AI Model ─────────────────────────────────────────────────────
-          _Section('AI Model', [
-            modelAsync.when(
-              loading: () => const ListTile(
-                leading: Icon(Icons.memory, color: AppColors.primary),
-                title: Text('Checking model…'),
+        maxWidth: 760,
+        child: ListView(
+          children: [
+            // ── AI Model ─────────────────────────────────────────────────────
+            _Section('AI Model', [
+              modelAsync.when(
+                loading: () => const ListTile(
+                  leading: Icon(Icons.memory, color: AppColors.primary),
+                  title: Text('Checking model…'),
+                ),
+                error: (_, __) => const ListTile(
+                  leading: Icon(Icons.memory, color: Colors.red),
+                  title: Text('Model check failed'),
+                ),
+                data: (info) => ListTile(
+                  leading: Icon(
+                    Icons.memory,
+                    color: info.isReady ? AppColors.teachColor : Colors.orange,
+                  ),
+                  title: const Text('Gemma 3 1B'),
+                  subtitle: Text(
+                    info.isReady
+                        ? 'Installed · ${info.platform ?? ''}'
+                        : 'Not installed — transfer via USB',
+                  ),
+                  trailing: info.isReady
+                      ? const Icon(
+                          Icons.check_circle,
+                          color: AppColors.teachColor,
+                        )
+                      : const Icon(Icons.warning_amber, color: Colors.orange),
+                ),
               ),
-              error: (_, __) => const ListTile(
-                leading: Icon(Icons.memory, color: Colors.red),
-                title: Text('Model check failed'),
+              const ListTile(
+                leading: Icon(
+                  Icons.info_outline,
+                  color: AppColors.textSecondary,
+                ),
+                title: Text('Model location'),
+                subtitle: Text('Use the model folder on Windows or Android'),
+                isThreeLine: true,
               ),
-              data: (info) => ListTile(
-                leading: Icon(Icons.memory,
-                    color: info.isReady
-                        ? AppColors.teachColor
-                        : Colors.orange),
-                title: const Text('Gemma 3 1B'),
-                subtitle: Text(info.isReady
-                    ? 'Installed · ${info.platform ?? ''}'
-                    : 'Not installed — transfer via USB'),
-                trailing: info.isReady
-                    ? const Icon(Icons.check_circle,
-                        color: AppColors.teachColor)
-                    : const Icon(Icons.warning_amber, color: Colors.orange),
-              ),
-            ),
-            const ListTile(
-              leading: Icon(Icons.info_outline,
-                  color: AppColors.textSecondary),
-              title: Text('Model location'),
-              subtitle: Text('Documents/OTIC/ (Windows) or Internal Storage/OTIC/ (Android)'),
-              isThreeLine: true,
-            ),
-          ]),
+            ]),
 
-          // ── Student ───────────────────────────────────────────────────────
-          _Section('Student Profile', [
-            studentAsync.when(
-              loading: () => const ListTile(title: Text('Loading…')),
-              error: (_, __) => const ListTile(title: Text('Error')),
-              data: (student) => ListTile(
-                leading: CircleAvatar(
-                  radius: 16,
-                  backgroundColor:
-                      AppColors.primary.withValues(alpha: 0.12),
-                  child: Text(
-                    student != null && student.name.isNotEmpty
-                        ? student.name[0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
+            // ── Student ───────────────────────────────────────────────────────
+            _Section('Student Profile', [
+              studentAsync.when(
+                loading: () => const ListTile(title: Text('Loading…')),
+                error: (_, __) => const ListTile(title: Text('Error')),
+                data: (student) => ListTile(
+                  leading: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                    child: Text(
+                      student != null && student.name.isNotEmpty
+                          ? student.name[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w700),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  title: Text(student?.name ?? 'No profile'),
+                  subtitle: Text(
+                    student != null
+                        ? [
+                            if (student.grade != null) student.grade!,
+                            'Style: ${student.learningStyle}',
+                            '${student.totalPoints} points',
+                          ].join(' · ')
+                        : 'Complete onboarding to start',
                   ),
                 ),
-                title: Text(student?.name ?? 'No profile'),
-                subtitle: Text(student != null
-                    ? [
-                        if (student.grade != null) student.grade!,
-                        'Style: ${student.learningStyle}',
-                        '${student.totalPoints} points',
-                      ].join(' · ')
-                    : 'Complete onboarding to start'),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.edit_outlined,
-                  color: AppColors.textSecondary),
-              title: const Text('Edit profile'),
-              subtitle: const Text('Update your interests and learning style'),
-              onTap: () => context.go('/onboarding'),
-              trailing: const Icon(Icons.chevron_right,
-                  color: AppColors.textHint),
-            ),
-          ]),
-
-          // ── Streak & Points ───────────────────────────────────────────────
-          studentAsync.when(
-            data: (student) => student != null
-                ? _Section('Progress', [
-                    ListTile(
-                      leading: const Icon(Icons.local_fire_department,
-                          color: Colors.orange),
-                      title: Text('${student.streakDays} day streak'),
-                      subtitle: const Text('Keep learning daily to grow your streak'),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.stars,
-                          color: Colors.amber),
-                      title: Text('${student.totalPoints} points earned'),
-                      subtitle: const Text('Points grow as you complete lessons and earn badges'),
-                    ),
-                  ])
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-
-          // ── App ──────────────────────────────────────────────────────────
-          _Section('App', [
-            const ListTile(
-              leading: Icon(Icons.info_outline,
-                  color: AppColors.textSecondary),
-              title: Text('Version'),
-              subtitle: Text('OTIC Studio v1.0.0 — Offline AI Learning OS'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.wifi_off,
-                  color: AppColors.primary),
-              title: const Text('Offline mode'),
-              subtitle: const Text('100% offline — no internet required'),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.teachColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              ListTile(
+                leading: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.textSecondary,
                 ),
-                child: const Text('Active',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.teachColor)),
+                title: const Text('Edit profile'),
+                subtitle: const Text(
+                  'Update your interests and learning style',
+                ),
+                onTap: () => context.go('/onboarding'),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textHint,
+                ),
               ),
-            ),
-          ]),
+            ]),
 
-          // ── Admin ────────────────────────────────────────────────────────
-          _Section('Administration', [
-            ListTile(
-              leading: const Icon(Icons.admin_panel_settings,
-                  color: AppColors.textSecondary),
-              title: const Text('Admin dashboard'),
-              subtitle: const Text(
-                  'Device info, model status, profiles, update management'),
-              onTap: () => context.go('/admin'),
-              trailing: const Icon(Icons.chevron_right,
-                  color: AppColors.textHint),
+            // ── Streak & Points ───────────────────────────────────────────────
+            studentAsync.when(
+              data: (student) => student != null
+                  ? _Section('Progress', [
+                      ListTile(
+                        leading: const Icon(
+                          Icons.local_fire_department,
+                          color: Colors.orange,
+                        ),
+                        title: Text('${student.streakDays} day streak'),
+                        subtitle: const Text(
+                          'Keep learning daily to grow your streak',
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.stars, color: Colors.amber),
+                        title: Text('${student.totalPoints} points earned'),
+                        subtitle: const Text(
+                          'Points grow as you complete lessons and earn badges',
+                        ),
+                      ),
+                    ])
+                  : const SizedBox.shrink(),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
-          ]),
 
-          // ── Danger zone ───────────────────────────────────────────────────
-          _Section('Data', [
-            ListTile(
-              leading:
-                  const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text('Reset all data',
-                  style: TextStyle(color: Colors.red)),
-              subtitle: const Text(
-                  'Deletes student profile, progress, and sessions'),
-              onTap: () => _confirmReset(context, ref),
-            ),
-          ]),
+            // ── App ──────────────────────────────────────────────────────────
+            _Section('App', [
+              const ListTile(
+                leading: Icon(
+                  Icons.info_outline,
+                  color: AppColors.textSecondary,
+                ),
+                title: Text('Version'),
+                subtitle: Text('Version 1.0.0'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.wifi_off, color: AppColors.primary),
+                title: const Text('Offline mode'),
+                subtitle: const Text('100% offline — no internet required'),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.teachColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Active',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.teachColor,
+                    ),
+                  ),
+                ),
+              ),
+            ]),
 
-          const SizedBox(height: 32),
-        ],
+            // ── Admin ────────────────────────────────────────────────────────
+            _Section('Administration', [
+              ListTile(
+                leading: const Icon(
+                  Icons.admin_panel_settings,
+                  color: AppColors.textSecondary,
+                ),
+                title: const Text('Admin dashboard'),
+                subtitle: const Text(
+                  'Device info, model status, profiles, update management',
+                ),
+                onTap: () => context.go('/admin'),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textHint,
+                ),
+              ),
+            ]),
+
+            // ── Danger zone ───────────────────────────────────────────────────
+            _Section('Data', [
+              ListTile(
+                leading: const Icon(Icons.delete_forever, color: Colors.red),
+                title: const Text(
+                  'Reset all data',
+                  style: TextStyle(color: Colors.red),
+                ),
+                subtitle: const Text(
+                  'Deletes student profile, progress, and sessions',
+                ),
+                onTap: () => _confirmReset(context, ref),
+              ),
+            ]),
+
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
@@ -187,14 +219,15 @@ class SettingsScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Reset all data?'),
         content: const Text(
-            'This permanently deletes your student profile, all progress, paths, badges, and session history. This cannot be undone.'),
+          'This permanently deletes your student profile, all progress, paths, badges, and session history. This cannot be undone.',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
-            style:
-                FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete everything'),
           ),

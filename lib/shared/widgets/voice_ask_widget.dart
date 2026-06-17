@@ -59,7 +59,7 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
                 child: TextField(
                   controller: _controller,
                   decoration: const InputDecoration(
-                    hintText: 'Ask OTIC anything…',
+                    hintText: 'Ask anything...',
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -79,7 +79,9 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
                         // TODO: wire up offline STT (Vosk)
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Voice input — offline STT coming soon'),
+                            content: Text(
+                              'Voice input — offline STT coming soon',
+                            ),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -90,7 +92,7 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
                         foregroundColor: Colors.white,
                         minimumSize: const Size(40, 40),
                       ),
-                      tooltip: 'VoiceAsk OTIC',
+                      tooltip: 'Voice input',
                     ),
                   ],
                 ),
@@ -103,21 +105,23 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
           spacing: 8,
           runSpacing: 8,
           children: _prompts
-              .map((p) => ActionChip(
-                    label: Text(
-                      p,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
+              .map(
+                (p) => ActionChip(
+                  label: Text(
+                    p,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
                     ),
-                    onPressed: () => setState(() => _controller.text = p),
-                    backgroundColor: AppColors.surface,
-                    side: const BorderSide(color: AppColors.border),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    visualDensity: VisualDensity.compact,
-                  ))
+                  ),
+                  onPressed: () => setState(() => _controller.text = p),
+                  backgroundColor: AppColors.surface,
+                  side: const BorderSide(color: AppColors.border),
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  visualDensity: VisualDensity.compact,
+                ),
+              )
               .toList(),
         ),
       ],

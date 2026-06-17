@@ -23,10 +23,7 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
     final pathAsync = ref.watch(pathByTopicProvider(widget.topic));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.topic),
-        leading: const BackButton(),
-      ),
+      appBar: AppBar(title: Text(widget.topic), leading: const BackButton()),
       body: pathAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -34,7 +31,8 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
           if (row == null) {
             return _GeneratingView(
               topic: widget.topic,
-              onGenerated: () => ref.invalidate(pathByTopicProvider(widget.topic)),
+              onGenerated: () =>
+                  ref.invalidate(pathByTopicProvider(widget.topic)),
             );
           }
           final parsed = parsedFromRow(row);
@@ -43,8 +41,14 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
             parsed: parsed,
             expandedUnit: _expandedUnit,
             onUnitTap: (i) => setState(() => _expandedUnit = i),
-            onLessonTap: (unitIndex, lessonIndex, lesson) =>
-                _openLesson(context, parsed, row.id, unitIndex, lessonIndex, lesson),
+            onLessonTap: (unitIndex, lessonIndex, lesson) => _openLesson(
+              context,
+              parsed,
+              row.id,
+              unitIndex,
+              lessonIndex,
+              lesson,
+            ),
           );
         },
       ),
@@ -64,7 +68,9 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
     await context.push('/learn?topic=${Uri.encodeComponent(topic)}');
 
     if (!mounted) return;
-    await ref.read(pathNotifierProvider.notifier).completeLesson(
+    await ref
+        .read(pathNotifierProvider.notifier)
+        .completeLesson(
           pathId: pathId,
           parsed: parsed,
           unitIndex: unitIndex,
@@ -127,10 +133,7 @@ class _PathHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            parsed.title,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text(parsed.title, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 6),
           Text(
             parsed.description,
@@ -147,7 +150,8 @@ class _PathHeader extends StatelessWidget {
                     minHeight: 8,
                     backgroundColor: AppColors.border,
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.learnColor),
+                      AppColors.learnColor,
+                    ),
                   ),
                 ),
               ),
@@ -246,12 +250,12 @@ class _UnitTile extends StatelessWidget {
         ),
         if (isExpanded)
           ...unit.lessons.asMap().entries.map(
-                (e) => _LessonRow(
-                  lesson: e.value,
-                  lessonIndex: e.key,
-                  onTap: () => onLessonTap(e.key, e.value),
-                ),
-              ),
+            (e) => _LessonRow(
+              lesson: e.value,
+              lessonIndex: e.key,
+              onTap: () => onLessonTap(e.key, e.value),
+            ),
+          ),
       ],
     );
   }
@@ -273,8 +277,12 @@ class _LessonRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.only(left: 64, right: 20, top: 14, bottom: 14),
+        padding: const EdgeInsets.only(
+          left: 64,
+          right: 20,
+          top: 14,
+          bottom: 14,
+        ),
         decoration: const BoxDecoration(
           color: AppColors.surfaceVariant,
           border: Border(bottom: BorderSide(color: AppColors.border)),
@@ -314,8 +322,11 @@ class _LessonRow extends StatelessWidget {
               ),
             ),
             if (!lesson.isCompleted)
-              const Icon(Icons.arrow_forward_ios,
-                  size: 13, color: AppColors.textHint),
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 13,
+                color: AppColors.textHint,
+              ),
           ],
         ),
       ),
@@ -345,8 +356,11 @@ class _GeneratingView extends ConsumerWidget {
                 color: AppColors.learnColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Icon(Icons.route,
-                  color: AppColors.learnColor, size: 32),
+              child: const Icon(
+                Icons.route,
+                color: AppColors.learnColor,
+                size: 32,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -356,10 +370,9 @@ class _GeneratingView extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'OTIC will design a 4-unit, 12-lesson curriculum tailored for you.',
+              'A 4-unit, 12-lesson curriculum will be tailored for you.',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: AppColors.textSecondary, height: 1.5),
+              style: TextStyle(color: AppColors.textSecondary, height: 1.5),
             ),
             const SizedBox(height: 28),
             FilledButton.icon(
@@ -372,7 +385,8 @@ class _GeneratingView extends ConsumerWidget {
               icon: const Icon(Icons.auto_awesome),
               label: const Text('Generate my path'),
               style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.learnColor),
+                backgroundColor: AppColors.learnColor,
+              ),
             ),
             const SizedBox(height: 12),
             TextButton(

@@ -70,13 +70,22 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             data: (engine) => Padding(
               padding: const EdgeInsets.only(right: 8),
               child: Chip(
-                avatar: const Icon(Icons.memory, size: 14, color: AppColors.teachColor),
+                avatar: const Icon(
+                  Icons.memory,
+                  size: 14,
+                  color: AppColors.teachColor,
+                ),
                 label: Text(
                   engine.backendLabel,
-                  style: const TextStyle(fontSize: 11, color: AppColors.teachColor),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.teachColor,
+                  ),
                 ),
                 backgroundColor: AppColors.teachColor.withValues(alpha: 0.08),
-                side: BorderSide(color: AppColors.teachColor.withValues(alpha: 0.3)),
+                side: BorderSide(
+                  color: AppColors.teachColor.withValues(alpha: 0.3),
+                ),
                 padding: EdgeInsets.zero,
               ),
             ),
@@ -98,63 +107,71 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         ],
       ),
       body: MaxWidth(
-          child: Column(
-        children: [
-          // Active paths strip — only shown when there are paths and chat is empty
-          chat.whenOrNull(
-            data: (state) => state.messages.isEmpty
-                ? _ActivePathsStrip(onPathTap: (topic) =>
-                    context.push('/path/${Uri.encodeComponent(topic)}'))
-                : null,
-          ) ?? const SizedBox.shrink(),
-          Expanded(
-            child: chat.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
-              data: (state) {
-                if (state.messages.isEmpty) {
-                  return _EmptyState(onTopic: (t) {
-                    ref.read(chatProvider.notifier).send(t);
-                  });
-                }
-                final itemCount = state.messages.length +
-                    (state.isGenerating && state.streamingText.isNotEmpty
-                        ? 1
-                        : 0);
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  itemCount: itemCount,
-                  itemBuilder: (context, i) {
-                    if (i == state.messages.length) {
-                      return _TutorBubble(
-                        text: state.streamingText,
-                        stage: null,
-                        followUp: null,
-                        isStreaming: true,
-                      );
-                    }
-                    final msg = state.messages[i];
-                    if (msg.isUser) return _UserBubble(text: msg.text);
-                    return _TutorBubble(
-                      text: msg.text,
-                      stage: msg.stage,
-                      followUp: msg.followUp,
-                      isStreaming: false,
+        child: Column(
+          children: [
+            // Active paths strip — only shown when there are paths and chat is empty
+            chat.whenOrNull(
+                  data: (state) => state.messages.isEmpty
+                      ? _ActivePathsStrip(
+                          onPathTap: (topic) => context.push(
+                            '/path/${Uri.encodeComponent(topic)}',
+                          ),
+                        )
+                      : null,
+                ) ??
+                const SizedBox.shrink(),
+            Expanded(
+              child: chat.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
+                data: (state) {
+                  if (state.messages.isEmpty) {
+                    return _EmptyState(
+                      onTopic: (t) {
+                        ref.read(chatProvider.notifier).send(t);
+                      },
                     );
-                  },
-                );
-              },
+                  }
+                  final itemCount =
+                      state.messages.length +
+                      (state.isGenerating && state.streamingText.isNotEmpty
+                          ? 1
+                          : 0);
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    itemCount: itemCount,
+                    itemBuilder: (context, i) {
+                      if (i == state.messages.length) {
+                        return _TutorBubble(
+                          text: state.streamingText,
+                          stage: null,
+                          followUp: null,
+                          isStreaming: true,
+                        );
+                      }
+                      final msg = state.messages[i];
+                      if (msg.isUser) return _UserBubble(text: msg.text);
+                      return _TutorBubble(
+                        text: msg.text,
+                        stage: msg.stage,
+                        followUp: msg.followUp,
+                        isStreaming: false,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          _InputBar(
-            controller: _controller,
-            onSend: _send,
-            isLoading: chat.valueOrNull?.isGenerating ?? false,
-          ),
-        ],
+            _InputBar(
+              controller: _controller,
+              onSend: _send,
+              isLoading: chat.valueOrNull?.isGenerating ?? false,
+            ),
+          ],
         ),
       ),
     );
@@ -257,14 +274,14 @@ class _PathChip extends StatelessWidget {
                 minHeight: 5,
                 backgroundColor: AppColors.border,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                    AppColors.learnColor),
+                  AppColors.learnColor,
+                ),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               '${path.completedLessons}/${path.totalLessons} lessons',
-              style: const TextStyle(
-                  fontSize: 11, color: AppColors.textHint),
+              style: const TextStyle(fontSize: 11, color: AppColors.textHint),
             ),
           ],
         ),
@@ -284,11 +301,11 @@ class _UserBubble extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.75,
+        ),
         margin: const EdgeInsets.only(bottom: 12),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: const BoxDecoration(
           color: AppColors.primary,
           borderRadius: BorderRadius.only(
@@ -298,8 +315,10 @@ class _UserBubble extends StatelessWidget {
             bottomRight: Radius.circular(18),
           ),
         ),
-        child: Text(text,
-            style: const TextStyle(color: Colors.white, height: 1.5)),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, height: 1.5),
+        ),
       ),
     );
   }
@@ -331,23 +350,28 @@ class _TutorBubble extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.auto_stories,
-                      size: 13, color: AppColors.textHint),
+                  const Icon(
+                    Icons.auto_stories,
+                    size: 13,
+                    color: AppColors.textHint,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     _label(stage!),
                     style: const TextStyle(
-                        fontSize: 11, color: AppColors.textHint),
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
                   ),
                 ],
               ),
             ),
           Container(
             constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * 0.82),
+              maxWidth: MediaQuery.sizeOf(context).width * 0.82,
+            ),
             margin: const EdgeInsets.only(bottom: 4),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: const BorderRadius.only(
@@ -365,7 +389,9 @@ class _TutorBubble extends StatelessWidget {
                   child: Text(
                     text.isEmpty ? '…' : text,
                     style: const TextStyle(
-                        color: AppColors.textPrimary, height: 1.6),
+                      color: AppColors.textPrimary,
+                      height: 1.6,
+                    ),
                   ),
                 ),
                 if (isStreaming) ...[
@@ -374,7 +400,9 @@ class _TutorBubble extends StatelessWidget {
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: AppColors.primary),
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
               ],
@@ -382,14 +410,14 @@ class _TutorBubble extends StatelessWidget {
           ),
           if (followUp != null && !isStreaming)
             Padding(
-              padding:
-                  const EdgeInsets.only(bottom: 12, left: 4),
+              padding: const EdgeInsets.only(bottom: 12, left: 4),
               child: Text(
                 followUp!,
                 style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textHint,
-                    fontStyle: FontStyle.italic),
+                  fontSize: 12,
+                  color: AppColors.textHint,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             )
           else
@@ -401,12 +429,18 @@ class _TutorBubble extends StatelessWidget {
 
   String _label(TutorStage s) {
     switch (s) {
-      case TutorStage.answer:   return 'OTIC · Answer';
-      case TutorStage.clarify:  return 'OTIC · Check understanding';
-      case TutorStage.practice: return 'OTIC · Practice';
-      case TutorStage.apply:    return 'OTIC · Apply it';
-      case TutorStage.create:   return 'OTIC · Create';
-      case TutorStage.reflect:  return 'OTIC · Reflect';
+      case TutorStage.answer:
+        return 'AI Tutor - Answer';
+      case TutorStage.clarify:
+        return 'AI Tutor - Check understanding';
+      case TutorStage.practice:
+        return 'AI Tutor - Practice';
+      case TutorStage.apply:
+        return 'AI Tutor - Apply it';
+      case TutorStage.create:
+        return 'AI Tutor - Create';
+      case TutorStage.reflect:
+        return 'AI Tutor - Reflect';
     }
   }
 }
@@ -502,8 +536,11 @@ class _EmptyState extends StatelessWidget {
               color: AppColors.learnColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.auto_stories,
-                color: AppColors.learnColor, size: 36),
+            child: const Icon(
+              Icons.auto_stories,
+              color: AppColors.learnColor,
+              size: 36,
+            ),
           ),
           const SizedBox(height: 20),
           Text(
@@ -513,7 +550,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'OTIC answers, then guides you through practice, apply, create, and reflect.',
+            'Your AI tutor answers, then guides you through practice, apply, create, and reflect.',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.textSecondary, height: 1.5),
           ),
@@ -523,12 +560,14 @@ class _EmptyState extends StatelessWidget {
             runSpacing: 8,
             alignment: WrapAlignment.center,
             children: _starters
-                .map((s) => ActionChip(
-                      label: Text(s),
-                      onPressed: () => onTopic(s),
-                      backgroundColor: AppColors.surfaceVariant,
-                      side: const BorderSide(color: AppColors.border),
-                    ))
+                .map(
+                  (s) => ActionChip(
+                    label: Text(s),
+                    onPressed: () => onTopic(s),
+                    backgroundColor: AppColors.surfaceVariant,
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                )
                 .toList(),
           ),
         ],

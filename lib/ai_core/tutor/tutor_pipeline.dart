@@ -1,7 +1,7 @@
 import '../inference/inference_engine.dart';
 import 'tutor_response.dart';
 
-/// Implements the OTIC tutor contract:
+/// Implements the AI tutor contract:
 ///   Answer → Clarify → Practice → Apply → Create → Reflect
 ///
 /// Each student message advances the pipeline one stage.
@@ -65,13 +65,16 @@ class TutorPipeline {
     _nextStage = idx < order.length - 1 ? order[idx + 1] : TutorStage.practice;
   }
 
-  String _buildPrompt(String studentMessage, TutorStage stage,
-      {String? safetyNote}) {
+  String _buildPrompt(
+    String studentMessage,
+    TutorStage stage, {
+    String? safetyNote,
+  }) {
     final historyText = _history
-        .map((t) => '${t.role == 'tutor' ? 'OTIC' : 'Student'}: ${t.text}')
+        .map((t) => '${t.role == 'tutor' ? 'Tutor' : 'Student'}: ${t.text}')
         .join('\n');
 
-    return '''You are OTIC, an expert offline AI tutor for students in under-resourced schools.
+    return '''You are an expert offline AI tutor for students in under-resourced schools.
 You respond in plain, encouraging language. Be concise (2-4 sentences max per stage).
 Never use bullet lists. Ask one question at the end. Never say "I am an AI".
 ${safetyNote != null ? '\n$safetyNote\n' : ''}
@@ -85,17 +88,23 @@ Stage instructions:
   reflect  → Ask the student to summarise what they learned in their own words.
 
 ${historyText.isNotEmpty ? 'Previous conversation:\n$historyText\n' : ''}Student: $studentMessage
-OTIC:''';
+Tutor:''';
   }
 
   double _temperatureForStage(TutorStage stage) {
     switch (stage) {
-      case TutorStage.answer:   return 0.5;
-      case TutorStage.clarify:  return 0.6;
-      case TutorStage.practice: return 0.7;
-      case TutorStage.apply:    return 0.8;
-      case TutorStage.create:   return 0.9;
-      case TutorStage.reflect:  return 0.6;
+      case TutorStage.answer:
+        return 0.5;
+      case TutorStage.clarify:
+        return 0.6;
+      case TutorStage.practice:
+        return 0.7;
+      case TutorStage.apply:
+        return 0.8;
+      case TutorStage.create:
+        return 0.9;
+      case TutorStage.reflect:
+        return 0.6;
     }
   }
 
@@ -118,15 +127,44 @@ OTIC:''';
 
   String _detectTopic(String message) {
     final lower = message.toLowerCase();
-    if (lower.contains('python') || lower.contains('code') || lower.contains('program')) return 'programming';
-    if (lower.contains('math') || lower.contains('algebra') || lower.contains('equation')) return 'mathematics';
-    if (lower.contains('physics') || lower.contains('gravity') || lower.contains('force')) return 'physics';
-    if (lower.contains('biology') || lower.contains('cell') || lower.contains('photosynthesis')) return 'biology';
-    if (lower.contains('business') || lower.contains('entrepreneur') || lower.contains('market')) return 'business';
-    if (lower.contains('history') || lower.contains('war') || lower.contains('colonial')) return 'history';
-    if (lower.contains('agriculture') || lower.contains('farm') || lower.contains('crop')) return 'agriculture';
-    if (lower.contains('ai') || lower.contains('machine learning') || lower.contains('data')) return 'ai_data';
-    return message.split(' ').take(3).join('_').toLowerCase().replaceAll(RegExp(r'[^a-z_]'), '');
+    if (lower.contains('python') ||
+        lower.contains('code') ||
+        lower.contains('program'))
+      return 'programming';
+    if (lower.contains('math') ||
+        lower.contains('algebra') ||
+        lower.contains('equation'))
+      return 'mathematics';
+    if (lower.contains('physics') ||
+        lower.contains('gravity') ||
+        lower.contains('force'))
+      return 'physics';
+    if (lower.contains('biology') ||
+        lower.contains('cell') ||
+        lower.contains('photosynthesis'))
+      return 'biology';
+    if (lower.contains('business') ||
+        lower.contains('entrepreneur') ||
+        lower.contains('market'))
+      return 'business';
+    if (lower.contains('history') ||
+        lower.contains('war') ||
+        lower.contains('colonial'))
+      return 'history';
+    if (lower.contains('agriculture') ||
+        lower.contains('farm') ||
+        lower.contains('crop'))
+      return 'agriculture';
+    if (lower.contains('ai') ||
+        lower.contains('machine learning') ||
+        lower.contains('data'))
+      return 'ai_data';
+    return message
+        .split(' ')
+        .take(3)
+        .join('_')
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z_]'), '');
   }
 
   /// Reset pipeline (e.g. user starts a new session).

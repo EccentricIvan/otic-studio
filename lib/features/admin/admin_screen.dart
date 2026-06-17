@@ -28,79 +28,87 @@ class AdminScreen extends ConsumerWidget {
           children: [
             // ── Device ───────────────────────────────────────────────────
             const _SectionTitle('Device'),
-            _InfoCard(children: [
-              _InfoRow(
-                icon: Icons.computer,
-                label: 'Platform',
-                value:
-                    '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
-              ),
-              const _InfoRow(
-                icon: Icons.apps,
-                label: 'App version',
-                value: 'OTIC Studio v1.0.0',
-              ),
-              const _InfoRow(
-                icon: Icons.wifi_off,
-                label: 'Network',
-                value: 'Fully offline — no internet used',
-              ),
-            ]),
+            _InfoCard(
+              children: [
+                _InfoRow(
+                  icon: Icons.computer,
+                  label: 'Platform',
+                  value:
+                      '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
+                ),
+                const _InfoRow(
+                  icon: Icons.apps,
+                  label: 'App version',
+                  value: 'Version 1.0.0',
+                ),
+                const _InfoRow(
+                  icon: Icons.wifi_off,
+                  label: 'Network',
+                  value: 'Fully offline — no internet used',
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
 
             // ── AI Model ─────────────────────────────────────────────────
             const _SectionTitle('AI Model'),
             modelAsync.when(
-              loading: () => const _InfoCard(children: [
-                ListTile(title: Text('Checking model…')),
-              ]),
-              error: (e, _) => _InfoCard(children: [
-                ListTile(title: Text('Model check failed: $e')),
-              ]),
-              data: (info) => _InfoCard(children: [
-                _InfoRow(
-                  icon: Icons.memory,
-                  label: 'Gemma 3 1B',
-                  value: info.isReady
-                      ? 'Installed · ${info.platform ?? ''}'
-                      : 'Not installed',
-                  valueColor:
-                      info.isReady ? AppColors.teachColor : Colors.orange,
-                ),
-                if (info.isReady && info.sizeBytes != null)
+              loading: () => const _InfoCard(
+                children: [ListTile(title: Text('Checking model…'))],
+              ),
+              error: (e, _) => _InfoCard(
+                children: [ListTile(title: Text('Model check failed: $e'))],
+              ),
+              data: (info) => _InfoCard(
+                children: [
                   _InfoRow(
-                    icon: Icons.sd_storage,
-                    label: 'Model size',
-                    value:
-                        '${(info.sizeBytes! / (1024 * 1024)).toStringAsFixed(0)} MB',
+                    icon: Icons.memory,
+                    label: 'Gemma 3 1B',
+                    value: info.isReady
+                        ? 'Installed · ${info.platform ?? ''}'
+                        : 'Not installed',
+                    valueColor: info.isReady
+                        ? AppColors.teachColor
+                        : Colors.orange,
                   ),
-                if (info.path != null)
-                  _InfoRow(
-                    icon: Icons.folder,
-                    label: 'Model path',
-                    value: info.path!,
-                  ),
-              ]),
+                  if (info.isReady && info.sizeBytes != null)
+                    _InfoRow(
+                      icon: Icons.sd_storage,
+                      label: 'Model size',
+                      value:
+                          '${(info.sizeBytes! / (1024 * 1024)).toStringAsFixed(0)} MB',
+                    ),
+                  if (info.path != null)
+                    _InfoRow(
+                      icon: Icons.folder,
+                      label: 'Model path',
+                      value: info.path!,
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
             // ── Users ────────────────────────────────────────────────────
             const _SectionTitle('Student Profiles'),
             studentsAsync.when(
-              loading: () => const _InfoCard(children: [
-                ListTile(title: Text('Loading students…')),
-              ]),
-              error: (e, _) => _InfoCard(children: [
-                ListTile(title: Text('Error: $e')),
-              ]),
+              loading: () => const _InfoCard(
+                children: [ListTile(title: Text('Loading students…'))],
+              ),
+              error: (e, _) =>
+                  _InfoCard(children: [ListTile(title: Text('Error: $e'))]),
               data: (students) => students.isEmpty
-                  ? const _InfoCard(children: [
-                      ListTile(
-                        leading: Icon(Icons.person_off,
-                            color: AppColors.textHint),
-                        title: Text('No student profiles on this device'),
-                      ),
-                    ])
+                  ? const _InfoCard(
+                      children: [
+                        ListTile(
+                          leading: Icon(
+                            Icons.person_off,
+                            color: AppColors.textHint,
+                          ),
+                          title: Text('No student profiles on this device'),
+                        ),
+                      ],
+                    )
                   : _InfoCard(
                       children: students
                           .map((s) => _StudentRow(student: s))
@@ -111,26 +119,29 @@ class AdminScreen extends ConsumerWidget {
 
             // ── Updates ──────────────────────────────────────────────────
             const _SectionTitle('Updates'),
-            const _InfoCard(children: [
-              _InfoRow(
-                icon: Icons.usb,
-                label: 'Update method',
-                value: 'USB drive or local school server — never internet',
-              ),
-              ListTile(
-                leading: Icon(Icons.info_outline,
-                    color: AppColors.textSecondary),
-                title: Text('How to update',
-                    style: TextStyle(fontSize: 14)),
-                subtitle: Text(
-                  '1. Receive the update package on a USB drive\n'
-                  '2. Copy the new app installer to this device\n'
-                  '3. Run the installer — student data is preserved\n'
-                  '4. New model files go in the OTIC folder',
-                  style: TextStyle(fontSize: 12, height: 1.6),
+            const _InfoCard(
+              children: [
+                _InfoRow(
+                  icon: Icons.usb,
+                  label: 'Update method',
+                  value: 'USB drive or local school server — never internet',
                 ),
-              ),
-            ]),
+                ListTile(
+                  leading: Icon(
+                    Icons.info_outline,
+                    color: AppColors.textSecondary,
+                  ),
+                  title: Text('How to update', style: TextStyle(fontSize: 14)),
+                  subtitle: Text(
+                    '1. Receive the update package on a USB drive\n'
+                    '2. Copy the new app installer to this device\n'
+                    '3. Run the installer — student data is preserved\n'
+                    '4. New model files go in the model folder',
+                    style: TextStyle(fontSize: 12, height: 1.6),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 40),
           ],
         ),
@@ -158,9 +169,10 @@ class _StudentRow extends ConsumerWidget {
         child: Text(
           student.name.isNotEmpty ? student.name[0].toUpperCase() : '?',
           style: const TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-              fontSize: 13),
+            color: AppColors.primary,
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
         ),
       ),
       title: Text(student.name, style: const TextStyle(fontSize: 14)),
@@ -182,12 +194,14 @@ class _StudentRow extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: Text('Delete ${student.name}?'),
         content: const Text(
-            'This permanently removes the profile and all learning data '
-            '(paths, badges, projects, sessions). This cannot be undone.'),
+          'This permanently removes the profile and all learning data '
+          '(paths, badges, projects, sessions). This cannot be undone.',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
@@ -264,10 +278,7 @@ class _InfoRow extends StatelessWidget {
       title: Text(label, style: const TextStyle(fontSize: 13)),
       subtitle: Text(
         value,
-        style: TextStyle(
-          fontSize: 12,
-          color: valueColor ?? AppColors.textHint,
-        ),
+        style: TextStyle(fontSize: 12, color: valueColor ?? AppColors.textHint),
       ),
     );
   }

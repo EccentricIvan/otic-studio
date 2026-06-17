@@ -1,4 +1,4 @@
-# OTIC Studio
+# Otic Studio
 
 **Offline AI-Powered Learning Operating System**
 
@@ -9,7 +9,7 @@
 
 > **Maintainers / new team:** start with **[HANDOVER.md](HANDOVER.md)** — it lists everything needed to build, change, release, and maintain the app, including the signing keystore and AI model that are not in the repo.
 
-OTIC Studio is a fully offline AI tutor and learning platform for students in schools with no reliable internet. Every feature — AI responses, curriculum generation, exercises, certificates, badges, even a website builder — runs entirely on-device. **No internet, no cloud, no external APIs, no accounts. Ever.**
+Otic Studio is a fully offline AI tutor and learning platform for students in schools with no reliable internet. Every feature — AI responses, curriculum generation, exercises, certificates, badges, even a website builder — runs entirely on-device. **No internet, no cloud, no external APIs, no accounts. Ever.**
 
 The AI model (Gemma 3 1B) is bundled and runs locally: LiteRT-LM on Android, llama.cpp on desktop. Updates ship by USB drive or local school LAN, never the internet.
 
@@ -24,7 +24,7 @@ Get the latest build from the [**Releases page**](https://github.com/malinzijere
 | `otic-studio-vX.Y.Z.apk` | **Android phones/tablets** (4 GB RAM) | Copy to the device, open it, allow "Install unknown apps" |
 | `otic-studio-windows-vX.Y.Z.zip` | **Windows desktop** (8 GB RAM) | Extract anywhere, run `otic_studio.exe` |
 
-Both can also be shared offline by USB, Bluetooth, or a local server. The APK is signed with the official OTIC Studio certificate (`CN=OTIC Studio, O=OTIC, L=Kampala, C=UG`); Android rejects updates not signed with the same key.
+Both can also be shared offline by USB, Bluetooth, or a local server. The APK is signed with the official Otic Studio certificate (`CN=Otic Studio, O=OTIC, L=Kampala, C=UG`); Android rejects updates not signed with the same key.
 
 ### The AI model (one extra step, once per device)
 

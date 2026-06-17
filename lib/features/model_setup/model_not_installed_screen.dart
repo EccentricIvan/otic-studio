@@ -54,7 +54,8 @@ class _ModelNotInstalledScreenState
       } else {
         setState(() {
           _installing = false;
-          _error = 'The file was copied but failed verification. '
+          _error =
+              'The file was copied but failed verification. '
               'Please try a fresh copy of the model file.';
         });
       }
@@ -92,8 +93,11 @@ class _ModelNotInstalledScreenState
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: const Icon(Icons.memory_outlined,
-                        color: AppColors.primary, size: 40),
+                    child: const Icon(
+                      Icons.memory_outlined,
+                      color: AppColors.primary,
+                      size: 40,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -105,11 +109,11 @@ class _ModelNotInstalledScreenState
                   Text(
                     widget.info.status == ModelStatus.corrupted
                         ? 'A model file was found but appears corrupted or '
-                            'incomplete. Please reinstall it below.'
-                        : 'OTIC Studio needs the Gemma 3 1B model file to '
-                            'work. No internet is needed — get the file from '
-                            'a USB drive or your school server, then install '
-                            'it below.',
+                              'incomplete. Please reinstall it below.'
+                        : 'The app needs the Gemma 3 1B model file to '
+                              'work. No internet is needed — get the file from '
+                              'a USB drive or your school server, then install '
+                              'it below.',
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -137,17 +141,25 @@ class _ModelNotInstalledScreenState
                           color: Colors.red.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: Colors.red.withValues(alpha: 0.4)),
+                            color: Colors.red.withValues(alpha: 0.4),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline,
-                                color: Colors.red, size: 18),
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 18,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(_error!,
-                                  style: const TextStyle(
-                                      color: Colors.red, fontSize: 13)),
+                              child: Text(
+                                _error!,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -162,8 +174,7 @@ class _ModelNotInstalledScreenState
                           child: OutlinedButton.icon(
                             icon: const Icon(Icons.refresh),
                             label: const Text('Check again'),
-                            onPressed: () =>
-                                ref.invalidate(modelInfoProvider),
+                            onPressed: () => ref.invalidate(modelInfoProvider),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -212,8 +223,10 @@ class _InstallProgress extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               const SizedBox(width: 12),
-              Text('Installing model… ${(progress * 100).toStringAsFixed(0)}%',
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Installing model… ${(progress * 100).toStringAsFixed(0)}%',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -259,26 +272,31 @@ class _InstructionsCard extends ConsumerWidget {
                 children: [
                   const Icon(Icons.usb, color: AppColors.primary, size: 18),
                   const SizedBox(width: 8),
-                  Text('Install by hand instead',
-                      style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Install by hand instead',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.copy, size: 18),
                     tooltip: 'Copy path',
-                    onPressed: () => Clipboard.setData(ClipboardData(text: text)),
+                    onPressed: () =>
+                        Clipboard.setData(ClipboardData(text: text)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              Text(text,
-                  style: const TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    height: 1.6,
-                  )),
+              Text(
+                text,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  height: 1.6,
+                ),
+              ),
             ],
           ),
         );

@@ -22,8 +22,7 @@ class WebsiteBuilderScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final started =
-        ref.watch(websiteBuilderProvider.select((s) => s.started));
+    final started = ref.watch(websiteBuilderProvider.select((s) => s.started));
     return started ? const _EditorView() : const _StartView();
   }
 }
@@ -42,14 +41,14 @@ class _StartView extends ConsumerWidget {
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'e.g. My Farm Page',
-          ),
+          decoration: const InputDecoration(hintText: 'e.g. My Farm Page'),
           onSubmitted: (v) => Navigator.pop(ctx, v),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
             child: const Text('Start building'),
@@ -111,7 +110,11 @@ class _EmptyStart extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.web, size: 64, color: AppColors.primary.withValues(alpha: 0.4)),
+          Icon(
+            Icons.web,
+            size: 64,
+            color: AppColors.primary.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: 16),
           const Text(
             'Build your first website',
@@ -145,8 +148,10 @@ class _SavedSiteTile extends ConsumerWidget {
           backgroundColor: _hex(site.themeColor).withValues(alpha: 0.15),
           child: Icon(Icons.web, color: _hex(site.themeColor)),
         ),
-        title: Text(site.title,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(
+          site.title,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         subtitle: Text(
           'Updated ${site.updatedAt.day}/${site.updatedAt.month}/${site.updatedAt.year}',
           style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -162,11 +167,13 @@ class _SavedSiteTile extends ConsumerWidget {
                 content: Text('"${site.title}" will be removed.'),
                 actions: [
                   TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancel')),
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('Cancel'),
+                  ),
                   FilledButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Delete')),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Delete'),
+                  ),
                 ],
               ),
             );
@@ -187,30 +194,35 @@ class _EditorView extends ConsumerWidget {
   Future<void> _save(BuildContext context, WidgetRef ref) async {
     final ok = await ref.read(websiteBuilderProvider.notifier).save();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(ok ? 'Website saved!' : 'Could not save — no profile.'),
-      backgroundColor: ok ? AppColors.teachColor : Colors.redAccent,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Website saved!' : 'Could not save — no profile.'),
+        backgroundColor: ok ? AppColors.teachColor : Colors.redAccent,
+      ),
+    );
   }
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {
     try {
-      final path =
-          await ref.read(websiteBuilderProvider.notifier).exportHtml();
+      final path = await ref.read(websiteBuilderProvider.notifier).exportHtml();
       if (!context.mounted) return;
       if (path != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Exported! Open it in a browser:\n$path'),
-          backgroundColor: AppColors.teachColor,
-          duration: const Duration(seconds: 5),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Exported! Open it in a browser:\n$path'),
+            backgroundColor: AppColors.teachColor,
+            duration: const Duration(seconds: 5),
+          ),
+        );
       }
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Export failed: $e'),
-        backgroundColor: Colors.redAccent,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
     }
   }
 
@@ -231,7 +243,9 @@ class _EditorView extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -257,11 +271,13 @@ class _EditorView extends ConsumerWidget {
                   content: const Text('You have unsaved changes.'),
                   actions: [
                     TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Stay')),
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Stay'),
+                    ),
                     FilledButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Leave')),
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Leave'),
+                    ),
                   ],
                 ),
               );
@@ -300,7 +316,10 @@ class _EditorView extends ConsumerWidget {
       body: isWide
           ? Row(
               children: [
-                const SizedBox(width: 170, child: _Palette(axis: Axis.vertical)),
+                const SizedBox(
+                  width: 170,
+                  child: _Palette(axis: Axis.vertical),
+                ),
                 const VerticalDivider(width: 1),
                 const Expanded(child: _Canvas()),
                 const VerticalDivider(width: 1),
@@ -388,10 +407,11 @@ class _Palette extends ConsumerWidget {
             child: Text(
               'BLOCKS',
               style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textHint,
-                  letterSpacing: 1),
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textHint,
+                letterSpacing: 1,
+              ),
             ),
           ),
           ...items,
@@ -427,8 +447,7 @@ class _PaletteChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(type.label, style: const TextStyle(fontSize: 13)),
           const SizedBox(width: 4),
-          const Icon(Icons.drag_indicator,
-              size: 14, color: AppColors.textHint),
+          const Icon(Icons.drag_indicator, size: 14, color: AppColors.textHint),
         ],
       ),
     );
@@ -511,9 +530,10 @@ class _Canvas extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
-                  child: Text('Drop new blocks here',
-                      style: TextStyle(
-                          fontSize: 12, color: AppColors.textHint)),
+                  child: Text(
+                    'Drop new blocks here',
+                    style: TextStyle(fontSize: 12, color: AppColors.textHint),
+                  ),
                 ),
               ),
             ),
@@ -541,13 +561,12 @@ class _CanvasItem extends ConsumerWidget {
   final bool aiBusy;
 
   bool get _aiCapable => switch (block.type) {
-        SiteBlockType.header ||
-        SiteBlockType.text ||
-        SiteBlockType.quote ||
-        SiteBlockType.list =>
-          true,
-        _ => false,
-      };
+    SiteBlockType.header ||
+    SiteBlockType.text ||
+    SiteBlockType.quote ||
+    SiteBlockType.list => true,
+    _ => false,
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -556,8 +575,7 @@ class _CanvasItem extends ConsumerWidget {
 
     // Dropping a palette block onto an existing block inserts above it.
     return DragTarget<SiteBlockType>(
-      onAcceptWithDetails: (d) =>
-          notifier.addBlock(d.data, beforeId: block.id),
+      onAcceptWithDetails: (d) => notifier.addBlock(d.data, beforeId: block.id),
       builder: (context, candidates, _) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Column(
@@ -596,16 +614,20 @@ class _CanvasItem extends ConsumerWidget {
                           index: index,
                           child: const Padding(
                             padding: EdgeInsets.all(8),
-                            child: Icon(Icons.drag_indicator,
-                                size: 18, color: AppColors.textHint),
+                            child: Icon(
+                              Icons.drag_indicator,
+                              size: 18,
+                              color: AppColors.textHint,
+                            ),
                           ),
                         ),
                         Text(
                           block.type.label,
                           style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textHint),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textHint,
+                          ),
                         ),
                         const Spacer(),
                         if (_aiCapable)
@@ -616,14 +638,17 @@ class _CanvasItem extends ConsumerWidget {
                                     width: 16,
                                     height: 16,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                 )
                               : IconButton(
-                                  icon: const Icon(Icons.auto_awesome,
-                                      size: 16,
-                                      color: AppColors.createColor),
-                                  tooltip: 'Ask OTIC to write this',
+                                  icon: const Icon(
+                                    Icons.auto_awesome,
+                                    size: 16,
+                                    color: AppColors.createColor,
+                                  ),
+                                  tooltip: 'Ask the AI tutor to write this',
                                   visualDensity: VisualDensity.compact,
                                   onPressed: () => notifier.aiFill(block.id),
                                 ),
@@ -638,7 +663,9 @@ class _CanvasItem extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
                       child: _BlockPreview(
-                          block: block, themeColor: themeColor),
+                        block: block,
+                        themeColor: themeColor,
+                      ),
                     ),
                   ],
                 ),
@@ -656,13 +683,15 @@ class _CanvasItem extends ConsumerWidget {
       isScrollControlled: true,
       builder: (_) => Padding(
         padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom),
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
         child: Consumer(
           builder: (context, ref, _) {
-            final b = ref.watch(websiteBuilderProvider
-                .select((s) => s.doc.blocks
-                    .where((x) => x.id == blockId)
-                    .firstOrNull));
+            final b = ref.watch(
+              websiteBuilderProvider.select(
+                (s) => s.doc.blocks.where((x) => x.id == blockId).firstOrNull,
+              ),
+            );
             if (b == null) return const SizedBox(height: 80);
             return _Inspector(key: ValueKey(b.id), block: b);
           },
@@ -680,10 +709,10 @@ class _BlockPreview extends StatelessWidget {
   final Color themeColor;
 
   TextAlign get _ta => switch (block.align) {
-        'center' => TextAlign.center,
-        'right' => TextAlign.right,
-        _ => TextAlign.left,
-      };
+    'center' => TextAlign.center,
+    'right' => TextAlign.right,
+    _ => TextAlign.left,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -700,18 +729,22 @@ class _BlockPreview extends StatelessWidget {
                 ? CrossAxisAlignment.center
                 : CrossAxisAlignment.start,
             children: [
-              Text(block.text,
-                  textAlign: _ta,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700)),
+              Text(
+                block.text,
+                textAlign: _ta,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               if (block.secondary.isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text(block.secondary,
-                    textAlign: _ta,
-                    style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9))),
+                Text(
+                  block.secondary,
+                  textAlign: _ta,
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
+                ),
               ],
             ],
           ),
@@ -731,9 +764,10 @@ class _BlockPreview extends StatelessWidget {
               if (block.text.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(block.text,
-                      style:
-                          const TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text(
+                    block.text,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
             ],
           ),
@@ -746,15 +780,18 @@ class _BlockPreview extends StatelessWidget {
             _ => Alignment.centerLeft,
           },
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
             decoration: BoxDecoration(
               color: themeColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(block.text,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600)),
+            child: Text(
+              block.text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         );
       case SiteBlockType.list:
@@ -764,19 +801,23 @@ class _BlockPreview extends StatelessWidget {
             if (block.text.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Text(block.text,
-                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(
+                  block.text,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
-            ...block.items.map((i) => Padding(
-                  padding: const EdgeInsets.only(left: 8, top: 2),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('•  ', style: TextStyle(color: themeColor)),
-                      Expanded(child: Text(i)),
-                    ],
-                  ),
-                )),
+            ...block.items.map(
+              (i) => Padding(
+                padding: const EdgeInsets.only(left: 8, top: 2),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('•  ', style: TextStyle(color: themeColor)),
+                    Expanded(child: Text(i)),
+                  ],
+                ),
+              ),
+            ),
           ],
         );
       case SiteBlockType.quote:
@@ -789,14 +830,20 @@ class _BlockPreview extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(block.text,
-                  style: const TextStyle(fontStyle: FontStyle.italic)),
+              Text(
+                block.text,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
               if (block.secondary.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: Text('— ${block.secondary}',
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.textSecondary)),
+                  child: Text(
+                    '— ${block.secondary}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -825,8 +872,12 @@ class _Inspector extends ConsumerWidget {
       const SizedBox(height: 12),
     ];
 
-    void addField(String label, String initial, void Function(String) onChanged,
-        {int maxLines = 1}) {
+    void addField(
+      String label,
+      String initial,
+      void Function(String) onChanged, {
+      int maxLines = 1,
+    }) {
       fields.addAll([
         TextFormField(
           initialValue: initial,
@@ -844,65 +895,85 @@ class _Inspector extends ConsumerWidget {
 
     switch (block.type) {
       case SiteBlockType.header:
-        addField('Title', block.text,
-            (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)));
         addField(
-            'Subtitle',
-            block.secondary,
-            (v) => notifier.updateBlock(
-                block.id, (b) => b.copyWith(secondary: v)));
+          'Title',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+        );
+        addField(
+          'Subtitle',
+          block.secondary,
+          (v) =>
+              notifier.updateBlock(block.id, (b) => b.copyWith(secondary: v)),
+        );
       case SiteBlockType.text:
         addField(
-            'Text',
-            block.text,
-            (v) =>
-                notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
-            maxLines: 5);
+          'Text',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+          maxLines: 5,
+        );
       case SiteBlockType.image:
-        addField('Caption', block.text,
-            (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)));
         addField(
-            'Describe the image',
-            block.secondary,
-            (v) => notifier.updateBlock(
-                block.id, (b) => b.copyWith(secondary: v)));
+          'Caption',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+        );
+        addField(
+          'Describe the image',
+          block.secondary,
+          (v) =>
+              notifier.updateBlock(block.id, (b) => b.copyWith(secondary: v)),
+        );
       case SiteBlockType.button:
-        addField('Button label', block.text,
-            (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)));
         addField(
-            'Link (https://…)',
-            block.secondary,
-            (v) => notifier.updateBlock(
-                block.id, (b) => b.copyWith(secondary: v)));
+          'Button label',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+        );
+        addField(
+          'Link (https://…)',
+          block.secondary,
+          (v) =>
+              notifier.updateBlock(block.id, (b) => b.copyWith(secondary: v)),
+        );
       case SiteBlockType.list:
-        addField('List title', block.text,
-            (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)));
         addField(
-            'Items (one per line)',
-            block.items.join('\n'),
-            (v) => notifier.updateBlock(
-                block.id,
-                (b) => b.copyWith(
-                    items: v
-                        .split('\n')
-                        .where((l) => l.trim().isNotEmpty)
-                        .toList())),
-            maxLines: 6);
+          'List title',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+        );
+        addField(
+          'Items (one per line)',
+          block.items.join('\n'),
+          (v) => notifier.updateBlock(
+            block.id,
+            (b) => b.copyWith(
+              items: v.split('\n').where((l) => l.trim().isNotEmpty).toList(),
+            ),
+          ),
+          maxLines: 6,
+        );
       case SiteBlockType.quote:
         addField(
-            'Quote',
-            block.text,
-            (v) =>
-                notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
-            maxLines: 3);
+          'Quote',
+          block.text,
+          (v) => notifier.updateBlock(block.id, (b) => b.copyWith(text: v)),
+          maxLines: 3,
+        );
         addField(
-            'Author',
-            block.secondary,
-            (v) => notifier.updateBlock(
-                block.id, (b) => b.copyWith(secondary: v)));
+          'Author',
+          block.secondary,
+          (v) =>
+              notifier.updateBlock(block.id, (b) => b.copyWith(secondary: v)),
+        );
       case SiteBlockType.divider:
-        fields.add(const Text('A divider has no settings.',
-            style: TextStyle(color: AppColors.textSecondary)));
+        fields.add(
+          const Text(
+            'A divider has no settings.',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+        );
     }
 
     if (block.type != SiteBlockType.divider &&
@@ -912,17 +983,21 @@ class _Inspector extends ConsumerWidget {
         SegmentedButton<String>(
           segments: const [
             ButtonSegment(
-                value: 'left', icon: Icon(Icons.format_align_left, size: 16)),
+              value: 'left',
+              icon: Icon(Icons.format_align_left, size: 16),
+            ),
             ButtonSegment(
-                value: 'center',
-                icon: Icon(Icons.format_align_center, size: 16)),
+              value: 'center',
+              icon: Icon(Icons.format_align_center, size: 16),
+            ),
             ButtonSegment(
-                value: 'right',
-                icon: Icon(Icons.format_align_right, size: 16)),
+              value: 'right',
+              icon: Icon(Icons.format_align_right, size: 16),
+            ),
           ],
           selected: {block.align},
-          onSelectionChanged: (s) => notifier.updateBlock(
-              block.id, (b) => b.copyWith(align: s.first)),
+          onSelectionChanged: (s) =>
+              notifier.updateBlock(block.id, (b) => b.copyWith(align: s.first)),
         ),
       ]);
     }
@@ -949,8 +1024,10 @@ class _SitePanel extends ConsumerWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.all(16),
       children: [
-        const Text('Page settings',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        const Text(
+          'Page settings',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        ),
         const SizedBox(height: 12),
         TextFormField(
           key: ValueKey('title_${state.projectId ?? 'new'}'),
@@ -963,8 +1040,10 @@ class _SitePanel extends ConsumerWidget {
           onChanged: notifier.setTitle,
         ),
         const SizedBox(height: 16),
-        const Text('Theme color',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        const Text(
+          'Theme color',
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 10,
@@ -990,8 +1069,7 @@ class _SitePanel extends ConsumerWidget {
                     ),
                   ),
                   child: selected
-                      ? const Icon(Icons.check,
-                          color: Colors.white, size: 18)
+                      ? const Icon(Icons.check, color: Colors.white, size: 18)
                       : null,
                 ),
               ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 
+const _brandLogoAsset = 'assets/branding/otic_logo.png';
+
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.child});
 
@@ -14,9 +16,24 @@ class AppShell extends StatelessWidget {
     _NavDest('Create', Icons.lightbulb_outlined, Icons.lightbulb, '/create'),
     _NavDest('Projects', Icons.folder_outlined, Icons.folder, '/projects'),
     _NavDest('Website', Icons.web_outlined, Icons.web, '/website'),
-    _NavDest('Achievements', Icons.emoji_events_outlined, Icons.emoji_events, '/achievements'),
-    _NavDest('Certificates', Icons.workspace_premium_outlined, Icons.workspace_premium, '/certificates'),
-    _NavDest('Collaborate', Icons.groups_outlined, Icons.groups, '/collaborate'),
+    _NavDest(
+      'Achievements',
+      Icons.emoji_events_outlined,
+      Icons.emoji_events,
+      '/achievements',
+    ),
+    _NavDest(
+      'Certificates',
+      Icons.workspace_premium_outlined,
+      Icons.workspace_premium,
+      '/certificates',
+    ),
+    _NavDest(
+      'Collaborate',
+      Icons.groups_outlined,
+      Icons.groups,
+      '/collaborate',
+    ),
     _NavDest('Teacher', Icons.school_outlined, Icons.school, '/teacher'),
     _NavDest('Settings', Icons.settings_outlined, Icons.settings, '/settings'),
   ];
@@ -53,20 +70,26 @@ class AppShell extends StatelessWidget {
 
     return Scaffold(
       body: child,
-      drawer: _AppDrawer(selectedIndex: selectedIndex, destinations: _destinations),
+      drawer: _AppDrawer(
+        selectedIndex: selectedIndex,
+        destinations: _destinations,
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: AppColors.border)),
         ),
         child: NavigationBar(
           selectedIndex: mobileSelected,
-          onDestinationSelected: (i) => context.go(_destinations[_mobileIndices[i]].path),
+          onDestinationSelected: (i) =>
+              context.go(_destinations[_mobileIndices[i]].path),
           destinations: _mobileIndices
-              .map((i) => NavigationDestination(
-                    icon: Icon(_destinations[i].icon),
-                    selectedIcon: Icon(_destinations[i].selectedIcon),
-                    label: _destinations[i].label,
-                  ))
+              .map(
+                (i) => NavigationDestination(
+                  icon: Icon(_destinations[i].icon),
+                  selectedIcon: Icon(_destinations[i].selectedIcon),
+                  label: _destinations[i].label,
+                ),
+              )
               .toList(),
         ),
       ),
@@ -87,29 +110,11 @@ class _SideNav extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.auto_stories, color: Colors.white, size: 20),
-                ),
-                const SizedBox(width: 10),
-                const Text(
-                  'OTIC Studio',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _BrandLogo(size: 44),
             ),
           ),
           const SizedBox(height: 20),
@@ -126,18 +131,26 @@ class _SideNav extends StatelessWidget {
                   child: ListTile(
                     dense: true,
                     selected: selected,
-                    selectedTileColor: AppColors.primary.withValues(alpha: 0.08),
+                    selectedTileColor: AppColors.primary.withValues(
+                      alpha: 0.08,
+                    ),
                     leading: Icon(
                       selected ? dest.selectedIcon : dest.icon,
-                      color: selected ? AppColors.primary : AppColors.textSecondary,
+                      color: selected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
                       size: 20,
                     ),
                     title: Text(
                       dest.label,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                        color: selected ? AppColors.primary : AppColors.textSecondary,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: selected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                     ),
                     shape: RoundedRectangleBorder(
@@ -165,10 +178,7 @@ class _SideNav extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Text(
                   'Offline · v1.1',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textHint,
-                  ),
+                  style: TextStyle(fontSize: 12, color: AppColors.textHint),
                 ),
               ],
             ),
@@ -198,38 +208,17 @@ class _AppDrawer extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 28, 16, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.auto_stories, color: Colors.white, size: 22),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'OTIC Studio',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const Text(
-                'Offline AI Learning OS',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-            ],
+            children: [const _BrandLogo(size: 48)],
           ),
         ),
         const Divider(indent: 16, endIndent: 16),
-        ...destinations.map((d) => NavigationDrawerDestination(
-              icon: Icon(d.icon),
-              selectedIcon: Icon(d.selectedIcon),
-              label: Text(d.label),
-            )),
+        ...destinations.map(
+          (d) => NavigationDrawerDestination(
+            icon: Icon(d.icon),
+            selectedIcon: Icon(d.selectedIcon),
+            label: Text(d.label),
+          ),
+        ),
       ],
     );
   }
@@ -242,4 +231,21 @@ class _NavDest {
   final IconData icon;
   final IconData selectedIcon;
   final String path;
+}
+
+class _BrandLogo extends StatelessWidget {
+  const _BrandLogo({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      _brandLogoAsset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      semanticLabel: 'Logo',
+    );
+  }
 }

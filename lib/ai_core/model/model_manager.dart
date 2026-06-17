@@ -6,8 +6,10 @@ import 'package:path/path.dart' as p;
 enum ModelStatus {
   /// Model file found and ready to load.
   ready,
+
   /// No model file present — user must transfer via USB.
   notInstalled,
+
   /// Model file exists but is corrupted (wrong size / bad header).
   corrupted,
 }
@@ -82,7 +84,13 @@ class ModelManager {
       try {
         final ext = await getExternalStorageDirectory();
         if (ext != null) {
-          paths.add(p.join(ext.parent.parent.parent.parent.path, 'OTIC', _androidModelName));
+          paths.add(
+            p.join(
+              ext.parent.parent.parent.parent.path,
+              'OTIC',
+              _androidModelName,
+            ),
+          );
         }
       } catch (_) {}
       // App-internal files dir
@@ -141,15 +149,17 @@ class ModelManager {
     final ext = p.extension(sourcePath).toLowerCase();
     if (!allowed.contains(ext)) {
       throw ModelInstallException(
-          'Wrong file type. This device needs a ${allowed.join(' or ')} '
-          'model file.');
+        'Wrong file type. This device needs a ${allowed.join(' or ')} '
+        'model file.',
+      );
     }
 
     final size = await source.length();
     if (size < _minSizeBytes) {
       throw const ModelInstallException(
-          'That file is too small to be the Gemma model — it should be '
-          'around 800 MB to 1 GB. The download or copy may be incomplete.');
+        'That file is too small to be the Gemma model — it should be '
+        'around 800 MB to 1 GB. The download or copy may be incomplete.',
+      );
     }
 
     final targetPath = await installTargetPath();
@@ -176,8 +186,9 @@ class ModelManager {
       if (await partial.exists()) await partial.delete();
       if (e is FileSystemException) {
         throw const ModelInstallException(
-            'Could not copy the model — the device may not have enough '
-            'free storage (about 1 GB is needed).');
+          'Could not copy the model — the device may not have enough '
+          'free storage (about 1 GB is needed).',
+        );
       }
       rethrow;
     }
@@ -187,18 +198,15 @@ class ModelManager {
   /// Where to tell the user to put the model file.
   Future<String> installInstructions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'Transfer the model file to your phone:\n'
-          '  USB → Internal Storage/OTIC/$_androidModelName\n\n'
+      return 'Transfer the model file to your phone with a USB cable, then '
+          'choose it with Install from file.\n\n'
           'Model: gemma-3-1b-it-gpu-int4.bin (~900 MB)\n'
-          'Source: Download from Google AI Edge on a PC,\n'
-          'then copy to the phone via USB cable.';
+          'Source: Download from Google AI Edge on a PC.';
     }
-    final docs = await getApplicationDocumentsDirectory();
-    final dir = p.join(docs.path, 'OTIC');
-    return 'Copy the model file to:\n'
-        '  $dir\\$_desktopModelName\n\n'
+    return 'Transfer the model file to this device, then choose it with '
+        'Install from file.\n\n'
         'Model: gemma-3-1b-q4_k_m.gguf (~800 MB)\n'
-        'Source: Download from Hugging Face (bartowski/gemma-3-1B-it-GGUF)\n'
-        'on a device with internet, then transfer via USB.';
+        'Source: Download from Hugging Face (bartowski/gemma-3-1B-it-GGUF) '
+        'on a device with internet.';
   }
 }

@@ -1,6 +1,6 @@
 {
-    "name": "otic_studio",
-    "short_name": "otic_studio",
+    "name": "Otic Studio",
+    "short_name": "Otic Studio",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

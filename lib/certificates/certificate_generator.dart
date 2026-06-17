@@ -16,7 +16,7 @@ class CertificateGenerator {
     required String studentName,
     required String pathTitle,
     required String topic,
-    String schoolName = 'OTIC Studio',
+    String schoolName = 'School',
   }) async {
     final doc = pw.Document();
     final dateStr = _formatDate(DateTime.now());
@@ -99,7 +99,9 @@ class CertificateGenerator {
               // Path title
               pw.Container(
                 padding: const pw.EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 12),
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: pw.BoxDecoration(
                   color: const PdfColor.fromInt(0xFFF1F5F9),
                   borderRadius: pw.BorderRadius.circular(8),
@@ -139,7 +141,7 @@ class CertificateGenerator {
               pw.Divider(color: const PdfColor.fromInt(0xFFE2E8F0)),
               pw.SizedBox(height: 12),
               pw.Text(
-                'OTIC Studio · Offline AI Learning OS · Powered by Gemma',
+                'Offline AI Learning OS · Powered by Gemma',
                 style: const pw.TextStyle(
                   fontSize: 10,
                   color: PdfColor.fromInt(0xFF94A3B8),
@@ -160,8 +162,9 @@ class CertificateGenerator {
 
     final bytes = await doc.save();
     final dir = await getApplicationDocumentsDirectory();
-    final certsDir =
-        Directory('${dir.path}${Platform.pathSeparator}otic_certificates');
+    final certsDir = Directory(
+      '${dir.path}${Platform.pathSeparator}otic_certificates',
+    );
     await certsDir.create(recursive: true);
 
     final safeName = studentName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
@@ -176,8 +179,18 @@ class CertificateGenerator {
 
   static String _formatDate(DateTime d) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }

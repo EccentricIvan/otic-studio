@@ -17,20 +17,12 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.auto_stories, color: Colors.white, size: 16),
-            ),
-            const SizedBox(width: 8),
-            const Text('OTIC Studio'),
-          ],
+        title: Image.asset(
+          'assets/branding/otic_logo.png',
+          width: 32,
+          height: 32,
+          fit: BoxFit.contain,
+          semanticLabel: 'Logo',
         ),
         actions: [
           OutlinedButton(
@@ -50,33 +42,27 @@ class HomeScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
         child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _HeroSection(),
-              const SizedBox(height: 48),
-              const SectionHeader(
-                title: 'Start Learning',
-                subtitle: 'Choose how you want to learn today',
-              ),
-              const SizedBox(height: 16),
-              _LearningModesGrid(),
-              const SizedBox(height: 48),
-              const _RecommendedSection(),
-              const SizedBox(height: 48),
-              const Center(
-                child: Text(
-                  'OTIC Studio · Offline AI Learning OS · v1.0',
-                  style: TextStyle(fontSize: 12, color: AppColors.textHint),
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _HeroSection(),
+                const SizedBox(height: 48),
+                const SectionHeader(
+                  title: 'Start Learning',
+                  subtitle: 'Choose how you want to learn today',
                 ),
-              ),
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 16),
+                _LearningModesGrid(),
+                const SizedBox(height: 48),
+                const _RecommendedSection(),
+                const SizedBox(height: 48),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -130,7 +116,9 @@ class _HeroSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.18)),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.18),
+            ),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
@@ -161,8 +149,7 @@ class _HeroSection extends StatelessWidget {
         const SizedBox(height: 28),
         VoiceAskWidget(
           onSubmit: (query) {
-            context.go(
-                '/learn?topic=${Uri.encodeComponent(query)}');
+            context.go('/learn?topic=${Uri.encodeComponent(query)}');
           },
         ),
       ],
@@ -174,10 +161,34 @@ class _LearningModesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final modes = [
-      const _Mode('Learn', 'Understand concepts with your AI mentor', Icons.menu_book, AppColors.learnColor, '/learn'),
-      const _Mode('Practice', 'Reinforce knowledge with exercises', Icons.edit, AppColors.practiceColor, '/practice'),
-      const _Mode('Create', 'Build real projects and solutions', Icons.lightbulb, AppColors.createColor, '/create'),
-      const _Mode('Teach', 'Achieve mastery by teaching OTIC', Icons.record_voice_over, AppColors.teachColor, '/teach'),
+      const _Mode(
+        'Learn',
+        'Understand concepts with your AI mentor',
+        Icons.menu_book,
+        AppColors.learnColor,
+        '/learn',
+      ),
+      const _Mode(
+        'Practice',
+        'Reinforce knowledge with exercises',
+        Icons.edit,
+        AppColors.practiceColor,
+        '/practice',
+      ),
+      const _Mode(
+        'Create',
+        'Build real projects and solutions',
+        Icons.lightbulb,
+        AppColors.createColor,
+        '/create',
+      ),
+      const _Mode(
+        'Teach',
+        'Achieve mastery by teaching a topic',
+        Icons.record_voice_over,
+        AppColors.teachColor,
+        '/teach',
+      ),
     ];
 
     return LayoutBuilder(
@@ -191,13 +202,15 @@ class _LearningModesGrid extends StatelessWidget {
           mainAxisSpacing: 12,
           childAspectRatio: cols == 4 ? 0.78 : 0.88,
           children: modes
-              .map((m) => LearningModeCard(
-                    title: m.title,
-                    description: m.description,
-                    icon: m.icon,
-                    color: m.color,
-                    onTap: () => context.go(m.path),
-                  ))
+              .map(
+                (m) => LearningModeCard(
+                  title: m.title,
+                  description: m.description,
+                  icon: m.icon,
+                  color: m.color,
+                  onTap: () => context.go(m.path),
+                ),
+              )
               .toList(),
         );
       },
@@ -242,17 +255,16 @@ class _RecommendedSection extends ConsumerWidget {
         // Personalise suggested topics using student interests
         final student = studentAsync.valueOrNull;
         final interests = student != null
-            ? (student.interestsJson.isNotEmpty &&
-                    student.interestsJson != '[]'
-                ? (student.interestsJson
-                    .replaceAll('[', '')
-                    .replaceAll(']', '')
-                    .replaceAll('"', '')
-                    .split(',')
-                    .map((s) => s.trim())
-                    .where((s) => s.isNotEmpty)
-                    .toList())
-                : <String>[])
+            ? (student.interestsJson.isNotEmpty && student.interestsJson != '[]'
+                  ? (student.interestsJson
+                        .replaceAll('[', '')
+                        .replaceAll(']', '')
+                        .replaceAll('"', '')
+                        .split(',')
+                        .map((s) => s.trim())
+                        .where((s) => s.isNotEmpty)
+                        .toList())
+                  : <String>[])
             : <String>[];
 
         return Column(
@@ -266,14 +278,19 @@ class _RecommendedSection extends ConsumerWidget {
                 onAction: () => context.go('/learn'),
               ),
               const SizedBox(height: 16),
-              ...paths.take(3).map((p) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _ActivePathCard(
-                      path: p,
-                      onTap: () => context.push(
-                          '/path/${Uri.encodeComponent(p.topic)}'),
+              ...paths
+                  .take(3)
+                  .map(
+                    (p) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _ActivePathCard(
+                        path: p,
+                        onTap: () => context.push(
+                          '/path/${Uri.encodeComponent(p.topic)}',
+                        ),
+                      ),
                     ),
-                  )),
+                  ),
               const SizedBox(height: 32),
             ],
             SectionHeader(
@@ -286,22 +303,23 @@ class _RecommendedSection extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             ..._suggestedTopics
-                .where((t) =>
-                    !rows.any((r) => r.topic == t.$1))
+                .where((t) => !rows.any((r) => r.topic == t.$1))
                 .take(3)
-                .map((t) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: LearningPathCard(
-                        title: t.$1,
-                        category: _category(t.$1),
-                        description: _desc(t.$1),
-                        icon: t.$2,
-                        color: t.$3,
-                        lessonCount: 12,
-                        onTap: () => context.push(
-                            '/path/${Uri.encodeComponent(t.$1)}'),
-                      ),
-                    )),
+                .map(
+                  (t) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: LearningPathCard(
+                      title: t.$1,
+                      category: _category(t.$1),
+                      description: _desc(t.$1),
+                      icon: t.$2,
+                      color: t.$3,
+                      lessonCount: 12,
+                      onTap: () =>
+                          context.push('/path/${Uri.encodeComponent(t.$1)}'),
+                    ),
+                  ),
+                ),
           ],
         );
       },
@@ -332,12 +350,9 @@ class _RecommendedSection extends ConsumerWidget {
       'Entrepreneurship':
           'Start and grow your business with step-by-step guidance',
       'Physics': 'Explore forces, energy, and laws that govern our universe',
-      'Mathematics':
-          'Build solid foundations — arithmetic through calculus',
-      'Biology':
-          'Discover the science of life, cells, and ecosystems',
-      'English Writing':
-          'Write clearly and confidently for any situation',
+      'Mathematics': 'Build solid foundations — arithmetic through calculus',
+      'Biology': 'Discover the science of life, cells, and ecosystems',
+      'English Writing': 'Write clearly and confidently for any situation',
     };
     return map[topic] ?? 'Build a complete understanding of $topic';
   }
@@ -378,7 +393,9 @@ class _ActivePathCard extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.learnColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20),
@@ -402,14 +419,14 @@ class _ActivePathCard extends StatelessWidget {
                 minHeight: 6,
                 backgroundColor: AppColors.border,
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                    AppColors.learnColor),
+                  AppColors.learnColor,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               '${path.completedLessons} of ${path.totalLessons} lessons complete',
-              style: const TextStyle(
-                  fontSize: 12, color: AppColors.textHint),
+              style: const TextStyle(fontSize: 12, color: AppColors.textHint),
             ),
           ],
         ),

@@ -33,15 +33,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   void _next() {
     if (_page == 0 && _nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your name')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter your name')));
       return;
     }
     if (_page < 3) {
       _pageController.nextPage(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
     } else {
       _finish();
     }
@@ -50,7 +51,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _finish() async {
     if (_saving) return;
     setState(() => _saving = true);
-    await ref.read(studentNotifierProvider.notifier).createProfile(
+    await ref
+        .read(studentNotifierProvider.notifier)
+        .createProfile(
           name: _nameController.text.trim(),
           age: _age,
           grade: _grade,
@@ -72,18 +75,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (i) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _page == i ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _page == i
-                        ? AppColors.primary
-                        : AppColors.border,
-                    borderRadius: BorderRadius.circular(4),
+                children: List.generate(
+                  4,
+                  (i) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: _page == i ? 24 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: _page == i ? AppColors.primary : AppColors.border,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
-                )),
+                ),
               ),
             ),
             Expanded(
@@ -101,10 +105,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   _InterestsPage(
                     selected: _interests,
-                    onToggle: (s) => setState(() =>
-                        _interests.contains(s)
-                            ? _interests.remove(s)
-                            : _interests.add(s)),
+                    onToggle: (s) => setState(
+                      () => _interests.contains(s)
+                          ? _interests.remove(s)
+                          : _interests.add(s),
+                    ),
                   ),
                   _StylePage(
                     selected: _learningStyle,
@@ -124,7 +129,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : Text(_page < 3 ? 'Continue' : 'Start learning'),
                 ),
               ),
@@ -151,25 +159,30 @@ class _NamePage extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           Container(
-            width: 64, height: 64,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(Icons.waving_hand,
-                color: AppColors.primary, size: 32),
+            child: const Icon(
+              Icons.waving_hand,
+              color: AppColors.primary,
+              size: 32,
+            ),
           ),
           const SizedBox(height: 24),
-          Text('Welcome to OTIC Studio',
-              style: Theme.of(context).textTheme.headlineLarge),
+          Text('Welcome', style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
           const Text(
             'Your personal offline AI tutor. Everything stays on this device — no internet ever.',
             style: TextStyle(color: AppColors.textSecondary, height: 1.6),
           ),
           const SizedBox(height: 40),
-          Text("What's your name?",
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            "What's your name?",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 12),
           TextField(
             controller: controller,
@@ -201,8 +214,12 @@ class _AgePage extends StatelessWidget {
   final void Function(String?) onGrade;
 
   static const _grades = [
-    'Primary 1–4', 'Primary 5–7', 'Secondary 1–3',
-    'Secondary 4–6', 'University', 'Self-learner',
+    'Primary 1–4',
+    'Primary 5–7',
+    'Secondary 1–3',
+    'Secondary 4–6',
+    'University',
+    'Self-learner',
   ];
 
   @override
@@ -216,43 +233,50 @@ class _AgePage extends StatelessWidget {
           Text('About you', style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
           const Text(
-            'This helps OTIC explain things at the right level. You can skip.',
+            'This helps the AI tutor explain things at the right level. You can skip.',
             style: TextStyle(color: AppColors.textSecondary, height: 1.6),
           ),
           const SizedBox(height: 32),
-          Text('How old are you?',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'How old are you?',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
             initialValue: age,
             decoration: const InputDecoration(
-                hintText: 'Select age (optional)'),
+              hintText: 'Select age (optional)',
+            ),
             items: List.generate(
               60,
               (i) => DropdownMenuItem(
-                  value: i + 5, child: Text('${i + 5} years old')),
+                value: i + 5,
+                child: Text('${i + 5} years old'),
+              ),
             ),
             onChanged: onAge,
           ),
           const SizedBox(height: 24),
-          Text('What grade/level are you in?',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'What grade/level are you in?',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: _grades
-                .map((g) => ChoiceChip(
-                      label: Text(g),
-                      selected: grade == g,
-                      onSelected: (_) => onGrade(grade == g ? null : g),
-                      selectedColor:
-                          AppColors.primary.withValues(alpha: 0.12),
-                      side: BorderSide(
-                          color: grade == g
-                              ? AppColors.primary
-                              : AppColors.border),
-                    ))
+                .map(
+                  (g) => ChoiceChip(
+                    label: Text(g),
+                    selected: grade == g,
+                    onSelected: (_) => onGrade(grade == g ? null : g),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.12),
+                    side: BorderSide(
+                      color: grade == g ? AppColors.primary : AppColors.border,
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -264,10 +288,7 @@ class _AgePage extends StatelessWidget {
 // ── Page 3: Interests ─────────────────────────────────────────────────────────
 
 class _InterestsPage extends StatelessWidget {
-  const _InterestsPage({
-    required this.selected,
-    required this.onToggle,
-  });
+  const _InterestsPage({required this.selected, required this.onToggle});
   final Set<String> selected;
   final void Function(String) onToggle;
 
@@ -299,13 +320,14 @@ class _InterestsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('What topics interest you?',
-                    style: Theme.of(context).textTheme.headlineLarge),
+                Text(
+                  'What topics interest you?',
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Pick as many as you like. OTIC will personalise your paths.',
-                  style:
-                      TextStyle(color: AppColors.textSecondary, height: 1.6),
+                  'Pick as many as you like. Your paths will be personalised.',
+                  style: TextStyle(color: AppColors.textSecondary, height: 1.6),
                 ),
               ],
             ),
@@ -338,11 +360,13 @@ class _InterestsPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(t.$2,
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
-                            size: 26),
+                        Icon(
+                          t.$2,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
+                          size: 26,
+                        ),
                         const SizedBox(height: 6),
                         Text(
                           t.$1,
@@ -406,11 +430,13 @@ class _StylePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          Text('How do you learn best?',
-              style: Theme.of(context).textTheme.headlineLarge),
+          Text(
+            'How do you learn best?',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
           const SizedBox(height: 8),
           const Text(
-            'OTIC adapts its teaching style to suit you.',
+            'The AI tutor adapts its teaching style to suit you.',
             style: TextStyle(color: AppColors.textSecondary, height: 1.6),
           ),
           const SizedBox(height: 32),
@@ -428,42 +454,50 @@ class _StylePage extends StatelessWidget {
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.border,
+                    color: isSelected ? AppColors.primary : AppColors.border,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(s.$2,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                        size: 28),
+                    Icon(
+                      s.$2,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      size: 28,
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(s.$3,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.textPrimary,
-                              )),
+                          Text(
+                            s.$3,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
                           const SizedBox(height: 2),
-                          Text(s.$4,
-                              style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary)),
+                          Text(
+                            s.$4,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     if (isSelected)
-                      const Icon(Icons.check_circle,
-                          color: AppColors.primary, size: 20),
+                      const Icon(
+                        Icons.check_circle,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
                   ],
                 ),
               ),

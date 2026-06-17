@@ -32,7 +32,8 @@ class _CollaborateScreenState extends ConsumerState<CollaborateScreen> {
     if (kIsWeb) {
       setState(() {
         _starting = false;
-        _error = 'Local network discovery is not available in the web '
+        _error =
+            'Local network discovery is not available in the web '
             'preview. Use the Windows, Linux, or Android app.';
       });
       return;
@@ -60,7 +61,8 @@ class _CollaborateScreenState extends ConsumerState<CollaborateScreen> {
       if (mounted) {
         setState(() {
           _starting = false;
-          _error = 'Could not join the local network (${e.osError?.message ?? e.message}). '
+          _error =
+              'Could not join the local network (${e.osError?.message ?? e.message}). '
               'Make sure this device is connected to the school Wi-Fi or LAN.';
         });
       }
@@ -82,8 +84,8 @@ class _CollaborateScreenState extends ConsumerState<CollaborateScreen> {
         child: _starting
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? _ErrorView(message: _error!)
-                : _PeersView(peers: _peers),
+            ? _ErrorView(message: _error!)
+            : _PeersView(peers: _peers),
       ),
     );
   }
@@ -105,7 +107,8 @@ class _PeersView extends StatelessWidget {
             color: AppColors.practiceColor.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-                color: AppColors.practiceColor.withValues(alpha: 0.2)),
+              color: AppColors.practiceColor.withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             children: [
@@ -117,8 +120,9 @@ class _PeersView extends StatelessWidget {
                       ? 'Searching for learners on your local network…'
                       : '${peers.length} learner${peers.length == 1 ? '' : 's'} nearby',
                   style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -128,10 +132,13 @@ class _PeersView extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Text(
-            'Everyone running OTIC Studio on the same Wi-Fi or LAN appears '
+            'Everyone using the app on the same Wi-Fi or LAN appears '
             'here automatically — no internet needed.',
             style: TextStyle(
-                fontSize: 12, color: AppColors.textSecondary, height: 1.5),
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -164,11 +171,15 @@ class _PeerCard extends StatelessWidget {
           child: Text(
             peer.name.isNotEmpty ? peer.name[0].toUpperCase() : '?',
             style: const TextStyle(
-                color: AppColors.practiceColor, fontWeight: FontWeight.w700),
+              color: AppColors.practiceColor,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-        title: Text(peer.name,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(
+          peer.name,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         subtitle: Text(
           peer.topic.isNotEmpty
               ? 'Learning: ${peer.topic}'
@@ -180,10 +191,13 @@ class _PeerCard extends StatelessWidget {
           children: [
             const Icon(Icons.stars, color: Colors.amber, size: 16),
             const SizedBox(width: 4),
-            Text('${peer.points}',
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary)),
+            Text(
+              '${peer.points}',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
         ),
       ),
@@ -202,11 +216,13 @@ class _EmptyPeers extends StatelessWidget {
         children: [
           Icon(Icons.wifi_tethering, size: 56, color: AppColors.textHint),
           SizedBox(height: 16),
-          Text('No learners found yet',
-              style: TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            'No learners found yet',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
           SizedBox(height: 8),
           Text(
-            'Ask a classmate to open OTIC Studio on the same network — '
+            'Ask a classmate to open the app on the same network — '
             'they will appear here within a few seconds.',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.textSecondary, height: 1.5),
@@ -231,14 +247,18 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off, size: 56, color: AppColors.textHint),
             const SizedBox(height: 16),
-            const Text('Local network unavailable',
-                style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text(
+              'Local network unavailable',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  color: AppColors.textSecondary, height: 1.5),
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
             ),
           ],
         ),
