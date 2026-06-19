@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- Experimental `/llama-test` screen for local Llama 3.2 1B Q4_K_M GGUF testing through `fllama`/llama.cpp.
+- Separate Llama model downloader that stores the GGUF in app documents/cache space, tracks download progress, and writes an install marker so the app does not repeatedly download the model.
+
+### Changed
+- Added `fllama` as an isolated dependency alongside the existing `flutter_gemma` MediaPipe/LiteRT-LM integration.
+- Android `minSdk` is now at least 23 for `fllama`; production Android keeps the existing Gemma path.
+- Added production `INTERNET` permission for the explicit Llama test-model download flow.
+
+### Notes
+- The Llama path is additive and is not wired into the production tutor providers.
+- `fllama` documents Android support for `arm64-v8a`, `armeabi-v7a`, and `x86_64`.
+
+---
+
 ## [1.1.0] — 2026-06-12
 
 ### Added

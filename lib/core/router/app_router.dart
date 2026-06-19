@@ -11,6 +11,7 @@ import '../../features/create/create_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/learn/learn_screen.dart';
 import '../../features/learn/path/path_detail_screen.dart';
+import '../../features/llama/llama_test_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/projects/projects_screen.dart';
@@ -65,6 +66,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/collaborate', builder: (_, __) => const CollaborateScreen()),
           GoRoute(path: '/teach', builder: (_, __) => const TeachScreen()),
           GoRoute(path: '/teacher', builder: (_, __) => const TeacherScreen()),
+          GoRoute(path: '/llama-test', builder: (_, __) => const LlamaTestScreen()),
           GoRoute(path: '/admin', builder: (_, __) => const AdminScreen()),
           GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
         ],
@@ -102,6 +104,7 @@ final appRouter = GoRouter(
         GoRoute(path: '/certificates', builder: (_, __) => const CertificatesScreen()),
         GoRoute(path: '/collaborate', builder: (_, __) => const CollaborateScreen()),
         GoRoute(path: '/teacher', builder: (_, __) => const TeacherScreen()),
+        GoRoute(path: '/llama-test', builder: (_, __) => const LlamaTestScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
       ],
     ),

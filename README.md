@@ -32,6 +32,14 @@ Both can also be shared offline by USB, Bluetooth, or a local server. The APK is
 
 The app is small; the AI tutor needs the **Gemma 3 1B model file (~1 GB)**, distributed separately on USB or a school server — never over the internet. The app runs without it and shows a **"Model Not Installed"** screen with an **Install from file…** button: pick the model from wherever you copied it and the app validates, copies, and activates it with a progress bar.
 
+### Experimental Llama 3.2 test model
+
+There is also an isolated `/llama-test` screen for A/B testing llama.cpp through
+`fllama`. It does **not** replace the Gemma/MediaPipe tutor path. Paste a direct
+GGUF URL, download **Llama 3.2 1B Q4_K_M** into the app documents directory, then
+send one-off prompts from that screen. The GGUF is never bundled in `assets/` or
+the APK.
+
 ---
 
 ## Features
@@ -76,8 +84,11 @@ The app is small; the AI tutor needs the **Gemma 3 1B model file (~1 GB)**, dist
 |---|---|---|---|
 | Android (4 GB+ RAM) | LiteRT-LM (Google, GPU/NPU) via `flutter_gemma` | Gemma 3 1B `.task`/`.bin` | ~1 GB |
 | Windows / Linux (8 GB+ RAM) | llama.cpp via `dart:ffi` | Gemma 3 1B Q4_K_M `.gguf` | ~800 MB |
+| Android test screen | llama.cpp via `fllama` | Llama 3.2 1B Q4_K_M `.gguf` | ~700 MB-1 GB |
 
 Both platforms implement the same `InferenceEngine` interface ([lib/ai_core/inference/](lib/ai_core/inference/)). The app detects the model at startup; when absent it falls back to a `MockEngine` so every screen still works for demonstration.
+
+The `fllama` path is intentionally separate under [lib/ai_core/llama/](lib/ai_core/llama/) and [lib/features/llama/](lib/features/llama/). It exists for local llama.cpp testing and is not used by the production tutor providers.
 
 ---
 
@@ -85,6 +96,7 @@ Both platforms implement the same `InferenceEngine` interface ([lib/ai_core/infe
 
 - **Flutter 3.44+ / Dart** — single codebase for Android and Desktop
 - **flutter_gemma 0.4.6** — LiteRT-LM on-device inference
+- **fllama 0.0.1** - experimental Android llama.cpp test screen
 - **Drift 2.20 + drift_flutter** — SQLite ORM for student data
 - **flutter_riverpod** — state management
 - **go_router** — navigation with async onboarding redirect
@@ -99,6 +111,7 @@ Both platforms implement the same `InferenceEngine` interface ([lib/ai_core/infe
 lib/
   ai_core/
     inference/        InferenceEngine + LiteRT-LM, llama.cpp, Mock engines
+    llama/            Experimental fllama downloader + Llama 3.2 test engine
     model/            ModelManager: detect, validate, install model file
     tutor/            TutorPipeline (Answer→Clarify→Practice→Apply→Create→Reflect)
     providers/        Riverpod engine, chat, and model-status providers
@@ -111,6 +124,7 @@ lib/
     website/          Website Builder (block model, HTML gen, canvas)  🆕
     projects/ achievements/ certificates/         student output
     teacher/ admin/ collaborate/ settings/        roles & ops
+    llama/            Standalone Llama 3.2 GGUF test screen
     onboarding/ model_setup/                       first-run flows
   gamification/       Badge definitions + award service
   certificates/       Offline PDF certificate generator

@@ -14,6 +14,7 @@ for how the pieces fit together.
 | **Flutter SDK** | 3.44+ | Includes Dart. Add `flutter/bin` to PATH. |
 | **JDK** | 17 (Temurin) | For Android builds. Avoid mismatched winget manifests. |
 | **Android SDK** | platforms 35 + 36, build-tools 34.0.0 | Only needed to build/run the Android app. |
+| **Android NDK + CMake** | NDK 28.0.12433566, CMake 3.31.0 | Needed by the experimental `fllama`/llama.cpp Android test path. |
 | **Visual Studio Build Tools** | "Desktop development with C++" | Only needed to build the Windows desktop app. |
 | **Git** | any recent | |
 | **GitHub CLI** (`gh`) | optional | Only for publishing releases. |
@@ -75,6 +76,16 @@ server) — it is never committed or downloaded over the internet.
   - Windows: `[Documents]/OTIC/gemma-3-1b-q4_k_m.gguf`
 
 Files matching `*.gguf`, `*.bin`, `*.ggml` are gitignored — do not commit them.
+
+### Experimental Llama 3.2 GGUF test model
+
+The `/llama-test` screen is a separate llama.cpp experiment using `fllama`. It
+downloads **Llama 3.2 1B Q4_K_M** from a direct URL into app documents storage
+and records a small install marker beside the file. This is for A/B testing only:
+it does not change the Gemma model installer or the production tutor engine.
+
+Do not place the Llama GGUF in `assets/` and do not commit it. The file is large
+and should stay outside the APK/repo.
 
 ---
 

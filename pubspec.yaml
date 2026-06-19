@@ -16,6 +16,8 @@ dependencies:
 
   # AI inference — Android: LiteRT-LM (Gemma), Desktop: llama.cpp via FFI
   flutter_gemma: ^0.4.2
+  # Independent llama.cpp test path for GGUF models
+  fllama: ^0.0.1
   ffi: ^2.1.0
 
   # Local storage — student memory, history summaries

@@ -35,6 +35,12 @@ class AppShell extends StatelessWidget {
       '/collaborate',
     ),
     _NavDest('Teacher', Icons.school_outlined, Icons.school, '/teacher'),
+    _NavDest(
+      'Llama Test',
+      Icons.science_outlined,
+      Icons.science,
+      '/llama-test',
+    ),
     _NavDest('Settings', Icons.settings_outlined, Icons.settings, '/settings'),
   ];
 

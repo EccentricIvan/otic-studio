@@ -113,6 +113,14 @@ it, but real AI responses need it.
 If the new team wants to source the model independently, it is Google's Gemma 3 1B,
 in LiteRT-LM format for Android and GGUF Q4_K_M for desktop.
 
+### Experimental Llama 3.2 test model
+
+The `/llama-test` route is a separate llama.cpp experiment using `fllama`. It
+downloads Llama 3.2 1B Q4_K_M GGUF from a direct URL into app documents storage
+and writes a small install marker beside it. This model is not part of the
+production Gemma/MediaPipe flow, is not bundled in the APK, and must not be
+committed to the repo.
+
 ---
 
 ## 5a. Reference values
@@ -158,6 +166,9 @@ apksigner verify --print-certs <apk>     # compare the printed SHA-256 to the ab
 - **Real-device model validation:** the app's switch from mock to real inference
   has been built but should be validated end-to-end on a physical Android phone and
   a Windows PC with the actual 1 GB model. This is the last gate before classroom use.
+- **Llama test path validation:** `/llama-test` is additive and should be checked
+  on real `arm64-v8a`, `armeabi-v7a`, and `x86_64` Android targets before anyone
+  compares it with the MediaPipe/Gemma tutor path.
 - **Website Builder follow-ups:** image blocks are styled placeholders (no real
   image embedding yet); sites are single-page; there is no in-app browser preview.
 - **Gradle cache location:** on the original machine the Gradle cache sat on a full

@@ -62,6 +62,21 @@ Three implementations:
 | `LlamaCppEngine` | Windows/Linux | llama.cpp through `dart:ffi`, GGUF Q4 |
 | `MockEngine` | any | deterministic canned responses for dev / no-model |
 
+### Experimental fllama path
+
+An additive Android-only test path lives outside the production
+`InferenceEngine` provider chain:
+
+| Piece | Location | Purpose |
+|---|---|---|
+| `LlamaModelManager` | [lib/ai_core/llama/](../lib/ai_core/llama/) | Downloads Llama 3.2 1B Q4_K_M GGUF into app documents storage and records an install marker. |
+| `FllamaEngine` | [lib/ai_core/llama/](../lib/ai_core/llama/) | Thin wrapper over `fllama` context loading and completions. |
+| `LlamaTestScreen` | [lib/features/llama/](../lib/features/llama/) | Manual URL download, prompt input, response display, and error handling. |
+
+This route is reachable at `/llama-test`. It exists to A/B test llama.cpp against
+the existing MediaPipe/Gemma path and does not replace `LiteRtLmEngine`,
+`ModelManager`, or `engineLoadedProvider`.
+
 ### Model lifecycle
 
 `ModelManager` ([model/model_manager.dart](../lib/ai_core/model/model_manager.dart))

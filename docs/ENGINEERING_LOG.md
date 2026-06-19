@@ -23,6 +23,26 @@ Entries are newest-first.
 
 ## Obstacles faced and how they were resolved
 
+### 0. Experimental llama.cpp path on Android without replacing Gemma
+**Problem:** the app already had Google's MediaPipe/LiteRT-LM path through
+`flutter_gemma`, but needed a second on-device LLM route for Llama 3.2 1B GGUF
+testing without disturbing production tutor inference.
+**Resolution:** added an isolated `fllama` path:
+- `lib/ai_core/llama/llama_model_manager.dart` downloads and verifies the GGUF
+  in app documents storage, with a `.part` file and install marker.
+- `lib/ai_core/llama/fllama_engine.dart` wraps fllama context loading and
+  completion calls.
+- `lib/features/llama/llama_test_screen.dart` exposes `/llama-test` for manual
+  download, prompt, response, and error testing.
+
+The existing `ModelManager`, `LiteRtLmEngine`, and `engineLoadedProvider` remain
+the production Gemma/MediaPipe path. `fllama` documents Android min SDK 23 and
+support for `arm64-v8a`, `armeabi-v7a`, and `x86_64`.
+
+**Verification note:** this change still needs `flutter pub get` and
+`flutter build apk --debug` on a machine with Flutter installed. The edit
+environment used here did not have `flutter` or `dart` on PATH.
+
 ### 1. C: drive runs out of space mid-build
 **Problem:** The C: drive repeatedly dropped to ~0 bytes during `flutter build`,
 breaking compilation. Gradle and Dart write large intermediate files to temp.
