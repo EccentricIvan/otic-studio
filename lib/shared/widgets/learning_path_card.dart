@@ -11,6 +11,7 @@ class LearningPathCard extends StatelessWidget {
     required this.color,
     required this.lessonCount,
     required this.onTap,
+    this.heroTag,
   });
 
   final String title;
@@ -20,6 +21,7 @@ class LearningPathCard extends StatelessWidget {
   final Color color;
   final int lessonCount;
   final VoidCallback onTap;
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,15 @@ class LearningPathCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(title, style: theme.textTheme.titleMedium),
+                    heroTag != null
+                        ? Hero(
+                            tag: heroTag!,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Text(title, style: theme.textTheme.titleMedium),
+                            ),
+                          )
+                        : Text(title, style: theme.textTheme.titleMedium),
                     const SizedBox(height: 3),
                     Text(
                       description,

@@ -23,7 +23,19 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
     final pathAsync = ref.watch(pathByTopicProvider(widget.topic));
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.topic), leading: const BackButton()),
+      appBar: AppBar(
+        title: Hero(
+          tag: 'path-title-${widget.topic}',
+          child: Material(
+            color: Colors.transparent,
+            child: Text(
+              widget.topic,
+              style: Theme.of(context).appBarTheme.titleTextStyle,
+            ),
+          ),
+        ),
+        leading: const BackButton(),
+      ),
       body: pathAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
