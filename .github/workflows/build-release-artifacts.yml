@@ -44,6 +44,17 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Patch fllama Android Gradle compatibility
+        shell: bash
+        run: |
+          PUB_CACHE_DIR="${PUB_CACHE:-$HOME/.pub-cache}"
+          FLLAMA_GRADLE="$(find "$PUB_CACHE_DIR/hosted" -path "*/fllama-0.0.1/android/build.gradle" -print -quit)"
+          test -n "$FLLAMA_GRADLE"
+          sed -i \
+            -e 's/apiVersion = "2.1"/apiVersion = "2.0"/' \
+            -e 's/languageVersion = "2.1"/languageVersion = "2.0"/' \
+            "$FLLAMA_GRADLE"
+
       - name: Build APK
         run: flutter build apk --release
 

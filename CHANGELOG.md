@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated Flutter web install metadata so hosted builds present Otic Studio branding instead of default project boilerplate.
 - CI now installs the Android NDK/CMake versions required by `fllama` before building the release APK.
+- CI normalizes `fllama`'s Android Kotlin language level so the release APK can compile with the package's declared Kotlin plugin.
 - Added `fllama` as an isolated dependency alongside the existing `flutter_gemma` MediaPipe/LiteRT-LM integration.
 - Android `minSdk` is now at least 23 for `fllama`; production Android keeps the existing Gemma path.
 - Added production `INTERNET` permission for the explicit Llama test-model download flow.
