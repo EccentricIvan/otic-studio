@@ -1,23 +1,35 @@
 {
     "name": "Otic Studio",
-    "short_name": "Otic Studio",
+    "short_name": "Otic",
+    "description": "Offline AI learning for Android tablets, phones, and classrooms.",
+    "id": ".",
     "start_url": ".",
+    "scope": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "display_override": [
+        "standalone",
+        "minimal-ui"
+    ],
+    "background_color": "#f8faf6",
+    "theme_color": "#0b6b64",
     "orientation": "portrait-primary",
+    "categories": [
+        "education",
+        "productivity"
+    ],
     "prefer_related_applications": false,
     "icons": [
         {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/Icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/Icon-maskable-192.png",
