@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../gamification/badge_definitions.dart';
+import '../../shared/widgets/confetti_burst.dart';
 import '../../shared/widgets/responsive.dart';
 
 class AchievementsScreen extends ConsumerWidget {
@@ -49,7 +51,9 @@ class _AchievementsBody extends ConsumerWidget {
             MediaQuery.sizeOf(context).width.clamp(0.0, 1000.0).toDouble();
         final cols = adaptiveColumns(width, min: 2, max: 5, itemWidth: 200);
 
-        return MaxWidth(
+        return Stack(
+          children: [
+            MaxWidth(
             maxWidth: 1000,
             child: CustomScrollView(
           slivers: [
@@ -88,6 +92,9 @@ class _AchievementsBody extends ConsumerWidget {
             ),
           ],
           ),
+        ),
+            if (earnedCount > 0) const ConfettiBurst(),
+          ],
         );
       },
     );

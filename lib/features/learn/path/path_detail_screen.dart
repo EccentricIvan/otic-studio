@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_progress_ring.dart';
 import '../../../shared/widgets/responsive.dart';
 import 'path_models.dart';
 import 'path_provider.dart';
@@ -139,44 +141,55 @@ class _PathHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-      color: AppColors.surface,
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(20, AppSpacing.md, 20, 20),
+      color: theme.colorScheme.surface,
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(parsed.title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 6),
-          Text(
-            parsed.description,
-            style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
+          AnimatedProgressRing(
+            progress: parsed.progressFraction,
+            size: 72,
+            strokeWidth: 6,
+            color: parsed.progressFraction >= 1.0
+                ? AppColors.success
+                : AppColors.learnColor,
+            child: Text(
+              '${(parsed.progressFraction * 100).round()}%',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: parsed.progressFraction >= 1.0
+                    ? AppColors.success
+                    : AppColors.learnColor,
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: parsed.progressFraction,
-                    minHeight: 8,
-                    backgroundColor: AppColors.border,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.learnColor,
-                    ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(parsed.title, style: theme.textTheme.titleLarge),
+                const SizedBox(height: 6),
+                Text(
+                  parsed.description,
+                  style: theme.textTheme.bodyMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '${parsed.completedLessons} of ${parsed.totalLessons} lessons',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: theme.textTheme.bodyMedium?.color,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '${parsed.completedLessons}/${parsed.totalLessons} lessons',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
