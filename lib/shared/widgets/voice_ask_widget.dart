@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 
 class VoiceAskWidget extends StatefulWidget {
   const VoiceAskWidget({super.key, this.onSubmit});
@@ -35,15 +34,14 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: AppSpacing.borderRadiusSm,
-            border: Border.all(color: theme.dividerColor),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -55,7 +53,7 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
           child: Row(
             children: [
               const SizedBox(width: 14),
-              Icon(Icons.search, color: theme.hintColor, size: 20),
+              const Icon(Icons.search, color: AppColors.textHint, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: TextField(
@@ -73,14 +71,17 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
                 ),
               ),
               Padding(
-                padding: AppSpacing.paddingXs,
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   children: [
                     IconButton.filled(
                       onPressed: () {
+                        // TODO: wire up offline STT (Vosk)
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Voice input — offline STT coming soon'),
+                            content: Text(
+                              'Voice input — offline STT coming soon',
+                            ),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -88,7 +89,7 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
                       icon: const Icon(Icons.mic, size: 18),
                       style: IconButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.textPrimary,
+                        foregroundColor: Colors.white,
                         minimumSize: const Size(40, 40),
                       ),
                       tooltip: 'Voice input',
@@ -99,23 +100,23 @@ class _VoiceAskWidgetState extends State<VoiceAskWidget> {
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: 12),
         Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
+          spacing: 8,
+          runSpacing: 8,
           children: _prompts
               .map(
                 (p) => ActionChip(
                   label: Text(
                     p,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: theme.textTheme.bodyMedium?.color,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   onPressed: () => setState(() => _controller.text = p),
-                  backgroundColor: theme.colorScheme.surface,
-                  side: BorderSide(color: theme.dividerColor),
+                  backgroundColor: AppColors.surface,
+                  side: const BorderSide(color: AppColors.border),
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   visualDensity: VisualDensity.compact,

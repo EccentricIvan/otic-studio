@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
-import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/responsive.dart';
 
 class ProjectsScreen extends ConsumerWidget {
@@ -173,14 +171,46 @@ class _ProjectCard extends StatelessWidget {
 class _EmptyProjects extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return EmptyState(
-      icon: Icons.folder_open,
-      title: 'No projects yet',
-      description:
-          'Go to Create mode to build your first project — an essay, business plan, experiment, or anything you can imagine.',
-      color: AppColors.createColor,
-      ctaLabel: 'Start a project',
-      onCta: () => context.go('/create'),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.createColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Icon(Icons.folder_open,
+                  color: AppColors.createColor, size: 32),
+            ),
+            const SizedBox(height: 18),
+            const Text('No projects yet',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                    color: AppColors.textPrimary)),
+            const SizedBox(height: 8),
+            const Text(
+              'Go to Create mode to build your first project — an essay, business plan, experiment, or anything you can imagine.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: AppColors.textSecondary, height: 1.5),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => context.go('/create'),
+              icon: const Icon(Icons.add),
+              label: const Text('Start a project'),
+              style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.createColor),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

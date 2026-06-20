@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_colors.dart';
 
 class ScreenPlaceholder extends StatelessWidget {
   const ScreenPlaceholder({
@@ -17,7 +17,6 @@ class ScreenPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -36,28 +35,28 @@ class ScreenPlaceholder extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               title,
-              style: theme.textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             Text(
               description,
-              style: theme.textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: 28),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: AppSpacing.borderRadiusSm,
-                border: Border.all(color: theme.dividerColor),
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
               ),
-              child: Text(
+              child: const Text(
                 'Coming soon — in development',
                 style: TextStyle(
                   fontSize: 12,
-                  color: theme.hintColor,
+                  color: AppColors.textHint,
                   fontStyle: FontStyle.italic,
                 ),
               ),

@@ -5,12 +5,10 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../certificates/certificate_generator.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 import '../../db/otic_database.dart';
 import '../../db/providers/db_provider.dart';
 import '../../features/learn/path/path_provider.dart';
 import '../../features/learn/path/path_models.dart';
-import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/responsive.dart';
 
 class CertificatesScreen extends ConsumerWidget {
@@ -274,15 +272,31 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EmptyState(
-      icon: Icons.workspace_premium,
-      title: savedCount > 0
-          ? 'No new paths to certify'
-          : 'No certificates yet',
-      description: hasAny
-          ? 'Complete all 12 lessons in a learning path to earn a certificate.'
-          : 'Start a learning path and complete all lessons to earn your first certificate.',
-      color: AppColors.secondary,
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          const Icon(Icons.workspace_premium,
+              size: 56, color: AppColors.textHint),
+          const SizedBox(height: 16),
+          Text(
+            savedCount > 0
+                ? 'No new paths to certify'
+                : 'No certificates yet',
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            hasAny
+                ? 'Complete all 12 lessons in a learning path to earn a certificate.'
+                : 'Start a learning path and complete all lessons to earn your first certificate.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: AppColors.textSecondary, height: 1.5),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -6,9 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../collaboration/lan_discovery.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 import '../../db/providers/db_provider.dart';
-import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/responsive.dart';
 
 class CollaborateScreen extends ConsumerStatefulWidget {
@@ -212,13 +210,25 @@ class _EmptyPeers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyState(
-      icon: Icons.wifi_tethering,
-      title: 'No learners found yet',
-      description:
-          'Ask a classmate to open the app on the same network — '
-          'they will appear here within a few seconds.',
-      color: AppColors.info,
+    return const Padding(
+      padding: EdgeInsets.all(40),
+      child: Column(
+        children: [
+          Icon(Icons.wifi_tethering, size: 56, color: AppColors.textHint),
+          SizedBox(height: 16),
+          Text(
+            'No learners found yet',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Ask a classmate to open the app on the same network — '
+            'they will appear here within a few seconds.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+          ),
+        ],
+      ),
     );
   }
 }
