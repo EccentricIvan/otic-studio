@@ -1,0 +1,51 @@
+name: Deploy Download Page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/branding/**'
+      - 'web/icons/**'
+      - 'web/favicon.png'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare site directory
+        run: |
+          mkdir -p _site/assets/branding
+          mkdir -p _site/web/icons
+          cp index.html _site/
+          cp assets/branding/otic_logo.png _site/assets/branding/
+          cp web/favicon.png _site/web/
+          cp web/icons/Icon-192.png _site/web/icons/
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

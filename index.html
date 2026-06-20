@@ -266,6 +266,29 @@
       line-height: 1.5;
     }
 
+    .site-footer {
+      padding: 32px clamp(18px, 6vw, 72px);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      text-align: center;
+    }
+
+    .footer-inner {
+      width: min(960px, 100%);
+      margin: 0 auto;
+    }
+
+    .site-footer p {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .site-footer p:last-child {
+      margin-bottom: 0;
+    }
+
     @media (max-width: 760px) {
       .topbar {
         min-height: 62px;
@@ -378,25 +401,39 @@
     </section>
   </main>
 
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>Otic Studio v1.1.0 &middot; Offline AI Learning</p>
+      <p>No accounts, no cloud, no internet required. Built for classrooms in Uganda and beyond.</p>
+    </div>
+  </footer>
+
   <script>
     const note = document.querySelector('[data-platform-note]');
     const apk = document.querySelector('[data-apk-download]');
     const ua = navigator.userAgent || '';
+    const isAndroid = /Android/i.test(ua);
     const isIos = /iPhone|iPad|iPod/i.test(ua);
 
-    if (/Android/i.test(ua)) {
-      note.textContent = 'Android detected. Tap the APK button, then open the downloaded file to install Otic Studio.';
+    if (isAndroid) {
+      note.textContent = 'Android detected — tap the button below to download the APK. Once downloaded, open the file from your notification bar to install.';
     } else if (isIos) {
-      note.textContent = 'This is an Android APK. Use an Android phone or tablet, or open the release page from a desktop to download the Windows build.';
+      note.textContent = 'Otic Studio is an Android app. Open this page on an Android phone or tablet to download the APK.';
       apk.textContent = 'Open release page';
       apk.href = 'https://github.com/malinzijeremiah01-lab/Otic-Studio/releases/tag/latest-build';
       apk.removeAttribute('download');
+    } else {
+      note.textContent = 'On a computer? Download the APK and transfer it to your Android phone via USB or Bluetooth. Or open this page directly on your phone.';
     }
 
     apk.addEventListener('click', () => {
-      note.textContent = isIos
-        ? 'Opening the release page. Android devices can install the APK from there.'
-        : 'Download started. If your browser blocks the APK, use the release page link and choose "otic-studio-latest.apk".';
+      if (isIos) {
+        note.textContent = 'Opening the release page. Use an Android device to install the APK.';
+      } else if (isAndroid) {
+        note.textContent = 'Download started! Check your notification bar. Once complete, tap the file to install. Allow "Install unknown apps" if prompted.';
+      } else {
+        note.textContent = 'Download started. Transfer the APK to an Android device to install it.';
+      }
     });
   </script>
 </body>

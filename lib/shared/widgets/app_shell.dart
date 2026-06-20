@@ -34,7 +34,9 @@ class AppShell extends StatelessWidget {
       Icons.groups,
       '/collaborate',
     ),
+    _NavDest('Teach', Icons.record_voice_over_outlined, Icons.record_voice_over, '/teach'),
     _NavDest('Teacher', Icons.school_outlined, Icons.school, '/teacher'),
+    _NavDest('Admin', Icons.admin_panel_settings_outlined, Icons.admin_panel_settings, '/admin'),
     _NavDest(
       'Llama Test',
       Icons.science_outlined,

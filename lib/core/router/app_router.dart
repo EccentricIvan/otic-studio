@@ -75,38 +75,3 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// Keep a simple non-provider router for backwards compat during build
-final appRouter = GoRouter(
-  navigatorKey: _rootKey,
-  initialLocation: '/',
-  routes: [
-    GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
-    ShellRoute(
-      navigatorKey: _shellKey,
-      builder: (context, state, child) => AppShell(child: child),
-      routes: [
-        GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
-        GoRoute(path: '/learn', builder: (_, state) {
-          final topic = state.uri.queryParameters['topic'];
-          return LearnScreen(initialTopic: topic);
-        }),
-        GoRoute(
-          path: '/path/:topic',
-          builder: (_, state) => PathDetailScreen(
-            topic: Uri.decodeComponent(state.pathParameters['topic'] ?? ''),
-          ),
-        ),
-        GoRoute(path: '/practice', builder: (_, __) => const PracticeScreen()),
-        GoRoute(path: '/create', builder: (_, __) => const CreateScreen()),
-        GoRoute(path: '/website', builder: (_, __) => const WebsiteBuilderScreen()),
-        GoRoute(path: '/projects', builder: (_, __) => const ProjectsScreen()),
-        GoRoute(path: '/achievements', builder: (_, __) => const AchievementsScreen()),
-        GoRoute(path: '/certificates', builder: (_, __) => const CertificatesScreen()),
-        GoRoute(path: '/collaborate', builder: (_, __) => const CollaborateScreen()),
-        GoRoute(path: '/teacher', builder: (_, __) => const TeacherScreen()),
-        GoRoute(path: '/llama-test', builder: (_, __) => const LlamaTestScreen()),
-        GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
-      ],
-    ),
-  ],
-);
