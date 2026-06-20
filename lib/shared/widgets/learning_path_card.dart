@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_spacing.dart';
 
 class LearningPathCard extends StatelessWidget {
   const LearningPathCard({
@@ -22,12 +23,13 @@ class LearningPathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppSpacing.borderRadiusLg,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.paddingSm,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -36,7 +38,7 @@ class LearningPathCard extends StatelessWidget {
                 height: 56,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppSpacing.borderRadiusSm,
                 ),
                 child: Icon(icon, color: color, size: 28),
               ),
@@ -61,22 +63,22 @@ class LearningPathCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    Text(title, style: theme.textTheme.titleMedium),
                     const SizedBox(height: 3),
                     Text(
                       description,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.play_circle_outline, size: 13, color: Color(0xFF94A3B8)),
+                        Icon(Icons.play_circle_outline, size: 13, color: theme.hintColor),
                         const SizedBox(width: 4),
                         Text(
                           '$lessonCount lessons',
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                          style: TextStyle(fontSize: 12, color: theme.hintColor),
                         ),
                       ],
                     ),

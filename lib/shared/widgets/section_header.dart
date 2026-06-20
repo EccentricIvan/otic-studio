@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({
@@ -17,6 +16,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -24,10 +24,10 @@ class SectionHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.headlineSmall),
+              Text(title, style: theme.textTheme.headlineSmall),
               if (subtitle != null) ...[
                 const SizedBox(height: 3),
-                Text(subtitle!, style: Theme.of(context).textTheme.bodyMedium),
+                Text(subtitle!, style: theme.textTheme.bodyMedium),
               ],
             ],
           ),
@@ -37,8 +37,8 @@ class SectionHeader extends StatelessWidget {
             onPressed: onAction,
             child: Text(
               actionLabel!,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),

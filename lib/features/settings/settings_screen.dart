@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../ai_core/providers/ai_provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/theme/theme_provider.dart';
 import '../../db/providers/db_provider.dart';
 import '../../shared/widgets/responsive.dart';
 
@@ -14,6 +16,8 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final studentAsync = ref.watch(activeStudentProvider);
     final modelAsync = ref.watch(modelInfoProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -21,6 +25,46 @@ class SettingsScreen extends ConsumerWidget {
         maxWidth: 760,
         child: ListView(
           children: [
+            // ── Appearance ──────────────────────────────────────────────────
+            _Section('Appearance', [
+              ListTile(
+                leading: Icon(
+                  themeMode == ThemeMode.dark
+                      ? Icons.dark_mode
+                      : themeMode == ThemeMode.light
+                          ? Icons.light_mode
+                          : Icons.brightness_auto,
+                  color: AppColors.primary,
+                ),
+                title: const Text('Theme'),
+                subtitle: Text(_themeModeLabel(themeMode)),
+                trailing: SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      icon: Icon(Icons.light_mode, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      icon: Icon(Icons.brightness_auto, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      icon: Icon(Icons.dark_mode, size: 18),
+                    ),
+                  ],
+                  selected: {themeMode},
+                  onSelectionChanged: (s) =>
+                      ref.read(themeModeProvider.notifier).setMode(s.first),
+                  showSelectedIcon: false,
+                  style: ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
+            ]),
+
             // ── AI Model ─────────────────────────────────────────────────────
             _Section('AI Model', [
               modelAsync.when(
@@ -35,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                 data: (info) => ListTile(
                   leading: Icon(
                     Icons.memory,
-                    color: info.isReady ? AppColors.teachColor : Colors.orange,
+                    color: info.isReady ? AppColors.success : Colors.orange,
                   ),
                   title: const Text('Gemma 3 1B'),
                   subtitle: Text(
@@ -44,18 +88,12 @@ class SettingsScreen extends ConsumerWidget {
                         : 'Not installed — transfer via USB',
                   ),
                   trailing: info.isReady
-                      ? const Icon(
-                          Icons.check_circle,
-                          color: AppColors.teachColor,
-                        )
+                      ? const Icon(Icons.check_circle, color: AppColors.success)
                       : const Icon(Icons.warning_amber, color: Colors.orange),
                 ),
               ),
               const ListTile(
-                leading: Icon(
-                  Icons.info_outline,
-                  color: AppColors.textSecondary,
-                ),
+                leading: Icon(Icons.info_outline),
                 title: Text('Model location'),
                 subtitle: Text('Use the model folder on Windows or Android'),
                 isThreeLine: true,
@@ -94,30 +132,22 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               ListTile(
-                leading: const Icon(
-                  Icons.edit_outlined,
-                  color: AppColors.textSecondary,
-                ),
+                leading: const Icon(Icons.edit_outlined),
                 title: const Text('Edit profile'),
-                subtitle: const Text(
-                  'Update your interests and learning style',
-                ),
+                subtitle: const Text('Update your interests and learning style'),
                 onTap: () => context.go('/onboarding'),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                ),
+                trailing: Icon(Icons.chevron_right, color: theme.hintColor),
               ),
             ]),
 
-            // ── Streak & Points ───────────────────────────────────────────────
+            // ── Streak & Points ──────────────────────────────────────────────
             studentAsync.when(
               data: (student) => student != null
                   ? _Section('Progress', [
                       ListTile(
                         leading: const Icon(
                           Icons.local_fire_department,
-                          color: Colors.orange,
+                          color: AppColors.streak,
                         ),
                         title: Text('${student.streakDays} day streak'),
                         subtitle: const Text(
@@ -125,7 +155,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ),
                       ListTile(
-                        leading: const Icon(Icons.stars, color: Colors.amber),
+                        leading: const Icon(Icons.stars, color: AppColors.primary),
                         title: Text('${student.totalPoints} points earned'),
                         subtitle: const Text(
                           'Points grow as you complete lessons and earn badges',
@@ -140,32 +170,26 @@ class SettingsScreen extends ConsumerWidget {
             // ── App ──────────────────────────────────────────────────────────
             _Section('App', [
               const ListTile(
-                leading: Icon(
-                  Icons.info_outline,
-                  color: AppColors.textSecondary,
-                ),
+                leading: Icon(Icons.info_outline),
                 title: Text('Version'),
-                subtitle: Text('Version 1.0.0'),
+                subtitle: Text('v1.1.0'),
               ),
               ListTile(
                 leading: const Icon(Icons.wifi_off, color: AppColors.primary),
                 title: const Text('Offline mode'),
                 subtitle: const Text('100% offline — no internet required'),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.teachColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    borderRadius: AppSpacing.borderRadiusSm,
                   ),
                   child: const Text(
                     'Active',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.teachColor,
+                      color: AppColors.success,
                     ),
                   ),
                 ),
@@ -175,23 +199,17 @@ class SettingsScreen extends ConsumerWidget {
             // ── Admin ────────────────────────────────────────────────────────
             _Section('Administration', [
               ListTile(
-                leading: const Icon(
-                  Icons.admin_panel_settings,
-                  color: AppColors.textSecondary,
-                ),
+                leading: const Icon(Icons.admin_panel_settings),
                 title: const Text('Admin dashboard'),
                 subtitle: const Text(
                   'Device info, model status, profiles, update management',
                 ),
                 onTap: () => context.go('/admin'),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                ),
+                trailing: Icon(Icons.chevron_right, color: theme.hintColor),
               ),
             ]),
 
-            // ── Danger zone ───────────────────────────────────────────────────
+            // ── Danger zone ──────────────────────────────────────────────────
             _Section('Data', [
               ListTile(
                 leading: const Icon(Icons.delete_forever, color: Colors.red),
@@ -206,12 +224,18 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ]),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.lg),
           ],
         ),
       ),
     );
   }
+
+  String _themeModeLabel(ThemeMode mode) => switch (mode) {
+    ThemeMode.light => 'Light',
+    ThemeMode.dark => 'Dark',
+    ThemeMode.system => 'Follow system',
+  };
 
   void _confirmReset(BuildContext context, WidgetRef ref) {
     showDialog<bool>(
@@ -235,7 +259,6 @@ class SettingsScreen extends ConsumerWidget {
       ),
     ).then((confirmed) async {
       if (confirmed != true) return;
-      // Go to onboarding which will recreate the profile
       if (context.mounted) context.go('/onboarding');
     });
   }
@@ -248,6 +271,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -255,10 +279,10 @@ class _Section extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
           child: Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               letterSpacing: 0.8,
             ),
           ),

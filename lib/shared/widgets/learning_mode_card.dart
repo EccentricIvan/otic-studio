@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_spacing.dart';
 
 class LearningModeCard extends StatelessWidget {
   const LearningModeCard({
@@ -21,9 +22,9 @@ class LearningModeCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppSpacing.borderRadiusLg,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.paddingSm,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -32,11 +33,11 @@ class LearningModeCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppSpacing.borderRadiusSm,
                 ),
                 child: Icon(icon, color: color, size: 22),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm),
               Text(title, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 4),
               Text(
@@ -45,7 +46,7 @@ class LearningModeCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
                   Text(

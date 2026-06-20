@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
 import '../../db/providers/db_provider.dart';
 import '../../shared/widgets/section_header.dart';
 import '../../shared/widgets/learning_mode_card.dart';
@@ -86,7 +87,7 @@ class _GuestBadge extends StatelessWidget {
             width: 6,
             height: 6,
             decoration: const BoxDecoration(
-              color: AppColors.teachColor,
+              color: AppColors.success,
               shape: BoxShape.circle,
             ),
           ),
@@ -114,10 +115,10 @@ class _HeroSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.07),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.18),
+              color: AppColors.primary.withValues(alpha: 0.25),
             ),
           ),
           child: const Row(
@@ -129,7 +130,7 @@ class _HeroSection extends StatelessWidget {
                 'Fully Offline · No Internet Required',
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.primary,
                 ),
               ),
@@ -365,15 +366,16 @@ class _ActivePathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppSpacing.borderRadiusSm,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingSm,
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          color: theme.colorScheme.surface,
+          borderRadius: AppSpacing.borderRadiusSm,
+          border: Border.all(color: theme.dividerColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
