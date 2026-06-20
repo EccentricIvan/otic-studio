@@ -15,6 +15,8 @@ class OticApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Otic Studio',
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
